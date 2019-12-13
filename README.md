@@ -1,6 +1,6 @@
 ## My Project
 
-TODO: Fill this README out!
+Check for permission.
 
 Be sure to:
 
