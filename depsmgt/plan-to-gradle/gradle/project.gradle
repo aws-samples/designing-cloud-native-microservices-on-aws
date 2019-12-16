@@ -1,0 +1,69 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'io.quarkus:quarkus-gradle-plugin:0.23.1'
+    }
+}
+
+defaultTasks 'clean', 'build'
+
+apply plugin: 'idea'
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: io.quarkus.gradle.QuarkusPlugin
+
+    group 'solid.humank.coffeeshop'
+    version '1.0'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    idea.module.inheritOutputDirs = true
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.deprecation = true
+        //options.compilerArgs += ['-Xlint:none', '-proc:none', '-nowarn']
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    buildDir = "${rootDir}/build/${rootDir.relativePath(projectDir)}"
+
+    tasks.named('test') {
+        useJUnitPlatform()
+        failFast = true
+        testLogging.showStandardStreams = true
+        testLogging.exceptionFormat 'full'
+    }
+
+    tasks.named('jar') {
+        // put parent name in final jar name, to resolve collision of child projects with same name under different parents
+        if (parent.depth > 0) {
+            archiveBaseName = "${parent.name}-${archiveBaseName.get()}"
+        }
+    }
+
+    afterEvaluate {
+        def buildTime = new Date()
+        tasks.withType(Jar) {
+            String ClassPathString = ''
+            configurations.runtime.each { ClassPathString += " lib\\" + it.name }
+            manifest {
+                attributes 'Implementation-Title': project.name,
+                        'Implementation-Version': project.version,
+                        'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                        'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}",
+                        'Built-By': System.getProperty('user.name'),
+                        'Built-On': "${InetAddress.localHost.hostName}/${InetAddress.localHost.hostAddress}",
+                        'Build-Time': buildTime.format('yyyy/MM/dd HH:mm:ss'),
+                        'Class-Path': ClassPathString
+            }
+        }
+    }
+}

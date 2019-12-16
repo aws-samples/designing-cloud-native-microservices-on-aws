@@ -78,3 +78,8 @@ sources/gradlew.bat
 sources/coffeeshop/.gradle
 sources/coffeeshop/build/
 
+#AWS CDK output
+**/cdk.out
+
+#Node JS dependencies node modules
+**/node_modules

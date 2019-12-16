@@ -1,0 +1,77 @@
+/*
+目標訴求:
+1. rootProject 是 coffeeshop, 這一層不需要 src folder.
+2. 子專案的部分， *-web 是唯一會需要提供web server的部分，這會直接使用 quarkus framework來提供 rest api，而且會依賴於 *-application (ex: orders-web 依賴於 orders-application)
+3. 子專案的部分， *-application都是提供服務的模組，並不是提供 web 應用，而這都會依賴於他相應的 *-domain (ex: orders-application依賴於 orders-domain)
+4. 子專案的部分， *-domain是所有的業務核心， 都會需要依賴於 ddd-commons
+5. 關於測試，會跑 quarkus test，具體可以試跑一下 orders-web 的單元測試
+ */
+buildscript {
+    ext {
+        quarkusJunitVersion = '0.22.0'
+        restAssuredVersion = '3.3.0'
+        cucumberVersion = '4.7.1'
+        lombokVersion = '1.18.10'
+        quarkusVersion = '0.23.1'
+        awsJavaVersion = '1.11.631'
+        awsVersion = '2.5.29'
+    }
+}
+
+apply from: file("${rootDir}/gradle/project.gradle")
+
+List testCompilePackage = ["io.quarkus:quarkus-junit5:${quarkusJunitVersion}", "io.rest-assured:rest-assured:${restAssuredVersion}"]
+List testImplementPackage = ["io.cucumber:cucumber-java8:${cucumberVersion}", "io.cucumber:cucumber-junit:${cucumberVersion}"]
+List implementationPackage = ["io.quarkus:quarkus-resteasy",
+                              "com.amazonaws:aws-java-sdk-lambda",
+                              "com.amazonaws:aws-java-sdk-dynamodb",
+                              "com.amazonaws:aws-lambda-java-core",
+                              "com.amazonaws:aws-lambda-java-events",
+                              "com.amazonaws:aws-java-sdk-events"]
+
+subprojects { dir ->
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+        // Lombok Support
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        // quarkus test
+        testCompile testCompilePackage
+        // cucumber test
+        testImplementation testImplementPackage
+        // quarkus
+        compile group: 'io.quarkus', name: 'quarkus-gradle-plugin', version: "${quarkusVersion}", ext: 'pom'
+        implementation enforcedPlatform("io.quarkus:quarkus-bom:${quarkusVersion}")
+        implementation platform("com.amazonaws:aws-java-sdk-bom:${awsJavaVersion}")
+        implementation platform("software.amazon.awssdk:bom:${awsVersion}")
+        implementation implementationPackage
+
+    }
+
+    if (dir.name.endsWith("-domain")) {
+        dependencies {
+            implementation project(":ddd-commons")
+        }
+    }
+
+    if (dir.name.endsWith("-application")) {
+        String modName = dir.name.substring(0, dir.name.lastIndexOf("-application"))
+        dependencies {
+            implementation project(":ddd-commons"), project(":${modName}-domain")
+        }
+    }
+
+    if (dir.name.endsWith("-web")) {
+        String modName = dir.name.substring(0, dir.name.lastIndexOf("-web"))
+        dependencies {
+            implementation project(":ddd-commons"), project(":${modName}-domain"), project(":${modName}-application")
+        }
+    }
+}
+

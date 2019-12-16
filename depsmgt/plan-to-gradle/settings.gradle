@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'io.quarkus') {
+                useModule("io.quarkus:quarkus-gradle-plugin:${requested.version}")
+            }
+        }
+    }
+
+}
+rootProject.name = 'coffeeshop'
+include 'ddd-commons'
+
+//include 'inventory-domain'
+//include 'inventory-application'
+//include 'inventory-web'
+//include 'coffee-application'
+//include 'coffee-domain'
+//include 'coffee-web'
+include 'orders-application'
+include 'orders-domain'
+include 'orders-web'

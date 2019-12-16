@@ -1,0 +1,43 @@
+{
+  "TableName": "Order",
+  "KeySchema": [
+    {
+      "AttributeName": "establishtime",
+      "KeyType": "HASH"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "establishtime",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "drinkHere",
+      "AttributeType": "B"
+    },
+    {
+      "AttributeName": "itemName",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "price",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "quantity",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "seatno",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "drinktemperature",
+      "AttributeType": "N"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 5,
+    "WriteCapacityUnits": 5
+  }
+}

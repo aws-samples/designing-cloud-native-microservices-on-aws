@@ -1,0 +1,18 @@
+{
+  "eventId": "e0c00a3d-9834-42fd-a3b0-b4214be31254",
+  "occurredDate": 1572865608.044000000,
+  "entityId": {
+    "abbr": "ord",
+    "seqNo": 90,
+    "occurredDate": 1572865608.031000000
+  },
+  "tableNo": "0",
+  "orderItems": [
+    {
+      "productId": "123",
+      "qty": 2,
+      "price": 200
+    }
+  ],
+  "createdDate": 1572865608.039000000
+}

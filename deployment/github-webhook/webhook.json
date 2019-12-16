@@ -1,0 +1,14 @@
+{"webhook":
+{"name": "EventStormingWorkshop-webhook",
+  "targetPipeline": "CoffeeShopPipeline",
+  "targetAction": "source_action_name",
+  "filters": [
+    {
+      "jsonPath": "$.ref",
+      "matchEquals": "refs/heads/{Branch}"
+    }
+  ],
+  "authentication": "GITHUB_HMAC",
+  "authenticationConfiguration": {"SecretToken":"secret"}
+}
+}

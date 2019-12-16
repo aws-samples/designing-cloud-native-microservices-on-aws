@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  AcceptOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java8
+      Handler: solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler::handleRequest
+      Timeout: 30
+      MemorySize: 128
+      CodeUri: s3://solid-humank-coffeeshop/6d45cd8788f4cb9abd785ca4eb6faad3
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AWSLambdaFullAccess
+        - CloudWatchEventsFullAccess
+      Events:
+        PurchaseOrder:
+          Type: Api
+          Properties:
+            Path: /order
+            Method: post
+Outputs:
+  AcceptOrderUrl:
+    Description: Accept Order created event URL
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/order
+  AcceptOrderFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+        - AcceptOrderFunction
+        - Arn

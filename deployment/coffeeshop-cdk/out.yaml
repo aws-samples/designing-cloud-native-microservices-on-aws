@@ -1,0 +1,1330 @@
+Resources:
+  Repository22E53BBD:
+    Type: AWS::ECR::Repository
+    Properties:
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"selection":{"tagStatus":"any","countType":"sinceImagePushed","countNumber":30,"countUnit":"days"},"action":{"type":"expire"}}]}'
+      RepositoryName: solid-humank-coffeeshop/orders-web
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/Repository/Resource
+  RepositoryCoffeeShopCodePipelineCoffeeShopPipeline2276F00DSourceEventRule367A45AD:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.ecr
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          requestParameters:
+            repositoryName:
+              - Ref: Repository22E53BBD
+            imageTag:
+              - latest
+          eventName:
+            - PutImage
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::Join:
+              - ""
+              - - "arn:"
+                - Ref: AWS::Partition
+                - ":codepipeline:us-west-2:584518143473:"
+                - Ref: CoffeeShopPipeline5BE09743
+          Id: Target0
+          RoleArn:
+            Fn::GetAtt:
+              - CoffeeShopPipelineEventsRole899656A8
+              - Arn
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/Repository/CoffeeShopCodePipelineCoffeeShopPipeline2276F00DSourceEventRule/Resource
+  CodeBuildIamRoleAC16D411:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CodeBuildIamRole/Resource
+  CodeBuildIamRoleDefaultPolicy1ADB8698:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - iam:GetRole
+              - iam:PassRole
+            Effect: Allow
+            Resource: "*"
+          - Action: cloudformation:*
+            Effect: Allow
+            Resource: "*"
+          - Action: lambda:*
+            Effect: Allow
+            Resource: "*"
+          - Action: ecr:*
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - Repository22E53BBD
+                      - Arn
+                  - "*"
+          - Action:
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - CoffeeShopBucketEF3ADD55
+                      - Arn
+                  - /*
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopBucketEF3ADD55
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopBucketEF3ADD55
+                        - Arn
+                    - /*
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopBucketEF3ADD55
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopBucketEF3ADD55
+                        - Arn
+                    - /*
+          - Action:
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopBucketEF3ADD55
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopBucketEF3ADD55
+                        - Arn
+                    - /*
+          - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :logs:us-west-2:584518143473:log-group:/aws/codebuild/
+                    - Ref: CodeBuildProject4B91CF3F
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :logs:us-west-2:584518143473:log-group:/aws/codebuild/
+                    - Ref: CodeBuildProject4B91CF3F
+                    - :*
+        Version: "2012-10-17"
+      PolicyName: CodeBuildIamRoleDefaultPolicy1ADB8698
+      Roles:
+        - Ref: CodeBuildIamRoleAC16D411
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CodeBuildIamRole/DefaultPolicy/Resource
+  CoffeeShopBucketEF3ADD55:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: coffeeshop-nxllha
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopBucket/Resource
+  CodeBuildProject4B91CF3F:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:1.0
+        PrivilegedMode: true
+        Type: LINUX_CONTAINER
+      ServiceRole:
+        Fn::GetAtt:
+          - CodeBuildIamRoleAC16D411
+          - Arn
+      Source:
+        BuildSpec:
+          Fn::Join:
+            - ""
+            - - >-
+                {
+                  "version": "0.2",
+                  "phases": {
+                    "install": {
+                      "runtime-versions": {
+                        "java": "corretto8"
+                      }
+                    },
+                    "build": {
+                      "commands": [
+                        "echo \"Build all modules\"",
+                        "echo \"Run Maven clean install to have all the required jars in local .m2 repository\"",
+                        "cd sources/coffeeshop",
+                        "mvn clean install -Dmaven.test.skip=true"
+                      ]
+                    },
+                    "post_build": {
+                      "commands": [
+                        "TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}",
+                        "LATEST=\"latest\"",
+                        "echo \"Pack web modules into docker and push to ECR\"",
+                        "echo \"ECR login now\"",
+                        "$(aws ecr get-login --no-include-email)",
+                        "pwd",
+                        "echo \"build orders-web docker image\"",
+                        "cd orders-web",
+                        "mvn package -Dmaven.test.skip=true",
+                        "docker build -f src/main/docker/Dockerfile.jvm -t 
+              - Fn::Select:
+                  - 4
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - .dkr.ecr.
+              - Fn::Select:
+                  - 3
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - "."
+              - Ref: AWS::URLSuffix
+              - /
+              - Ref: Repository22E53BBD
+              - >-
+                :$LATEST .",
+                        "docker images",
+                        "docker tag 
+              - Fn::Select:
+                  - 4
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - .dkr.ecr.
+              - Fn::Select:
+                  - 3
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - "."
+              - Ref: AWS::URLSuffix
+              - /
+              - Ref: Repository22E53BBD
+              - ":$LATEST "
+              - Fn::Select:
+                  - 4
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - .dkr.ecr.
+              - Fn::Select:
+                  - 3
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - "."
+              - Ref: AWS::URLSuffix
+              - /
+              - Ref: Repository22E53BBD
+              - >-
+                :$TAG",
+                        "echo \"Pushing Orders-web\"",
+                        "docker images",
+                        "docker push 
+              - Fn::Select:
+                  - 4
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - .dkr.ecr.
+              - Fn::Select:
+                  - 3
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - "."
+              - Ref: AWS::URLSuffix
+              - /
+              - Ref: Repository22E53BBD
+              - >-
+                :$TAG",
+                        "docker push 
+              - Fn::Select:
+                  - 4
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - .dkr.ecr.
+              - Fn::Select:
+                  - 3
+                  - Fn::Split:
+                      - ":"
+                      - Fn::GetAtt:
+                          - Repository22E53BBD
+                          - Arn
+              - "."
+              - Ref: AWS::URLSuffix
+              - /
+              - Ref: Repository22E53BBD
+              - >-
+                :$LATEST",
+                        "echo \"finished ECR push\"",
+                        "echo package coffee serverless lambda function",
+                        "cd ../coffee-sls",
+                        "mvn package -Dmaven.test.skip=true",
+                        "sam package --template-file template.yaml --s3-bucket coffeeshop-nxllha --output-template-file packaged.yaml",
+                        "sam deploy --template-file ./packaged.yaml --stack-name coffee-sls --capabilities CAPABILITY_IAM"
+                      ]
+                    }
+                  },
+                  "cache": {
+                    "paths": [
+                      "/root/.m2/**/*"
+                    ]
+                  }
+                }
+        Location: https://github.com/humank/EventStormingWorkShop.git
+        ReportBuildStatus: true
+        Type: GITHUB
+      Cache:
+        Modes:
+          - LOCAL_DOCKER_LAYER_CACHE
+          - LOCAL_CUSTOM_CACHE
+        Type: LOCAL
+      Triggers:
+        FilterGroups:
+          - - Pattern: PUSH
+              Type: EVENT
+            - Pattern: refs/heads/master
+              Type: HEAD_REF
+        Webhook: true
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CodeBuildProject/Resource
+  ClusterEB0386A7:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: coffeeshop
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/Cluster/Resource
+  orderswebTaskTaskRoleB192F1EF:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/TaskRole/Resource
+  orderswebTaskTaskRoleDefaultPolicy0DA70FBE:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: events:*
+            Effect: Allow
+            Resource: "*"
+          - Action: dynamodb:*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - Order702A5B72
+                  - Arn
+              - Ref: AWS::NoValue
+          - Action: dynamodb:*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeE126F75C
+                  - Arn
+              - Ref: AWS::NoValue
+          - Action:
+              - ssm:DescribeParameters
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParameterHistory
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - :ssm:us-west-2:584518143473:parameter
+                  - Ref: eventSourceParamCF505C7B
+          - Action:
+              - ssm:DescribeParameters
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParameterHistory
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - :ssm:us-west-2:584518143473:parameter
+                  - Ref: eventArnParam2D3A232C
+        Version: "2012-10-17"
+      PolicyName: orderswebTaskTaskRoleDefaultPolicy0DA70FBE
+      Roles:
+        - Ref: orderswebTaskTaskRoleB192F1EF
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/TaskRole/DefaultPolicy/Resource
+  orderswebTask836C0A2C:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Essential: true
+          Image: amazon/amazon-ecs-sample
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: orderswebTaskdefaultContainerLogGroupD3EA3B52
+              awslogs-stream-prefix: coffeeshop
+              awslogs-region: us-west-2
+          Name: defaultContainer
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - orderswebTaskExecutionRole8AA754CF
+          - Arn
+      Family: CoffeeShopCodePipelineorderswebTask152D9080
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
+        Fn::GetAtt:
+          - orderswebTaskTaskRoleB192F1EF
+          - Arn
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/Resource
+  orderswebTaskdefaultContainerLogGroupD3EA3B52:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/defaultContainer/LogGroup/Resource
+  orderswebTaskExecutionRole8AA754CF:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/ExecutionRole/Resource
+  orderswebTaskExecutionRoleDefaultPolicyAD1F9B33:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - orderswebTaskdefaultContainerLogGroupD3EA3B52
+                - Arn
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - Repository22E53BBD
+                - Arn
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: orderswebTaskExecutionRoleDefaultPolicyAD1F9B33
+      Roles:
+        - Ref: orderswebTaskExecutionRole8AA754CF
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/orders-web-Task/ExecutionRole/DefaultPolicy/Resource
+  AlbSvcLB283AF851:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      SecurityGroups:
+        - Fn::GetAtt:
+            - AlbSvcLBSecurityGroupE09A4D3B
+            - GroupId
+      Subnets:
+        - subnet-0a530988b5f57e0bc
+        - subnet-05bc63e5b5f37d2a9
+        - subnet-0b5765cd3c7f3ba70
+      Type: application
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/LB/Resource
+  AlbSvcLBSecurityGroupE09A4D3B:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Automatically created Security Group for ELB CoffeeShopCodePipelineAlbSvcLBDFA1B523
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow from anyone on port 80
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: vpc-01edd8dfac7dc7e27
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/LB/SecurityGroup/Resource
+  AlbSvcLBSecurityGrouptoCoffeeShopCodePipelineAlbSvcServiceSecurityGroup2E4832AC8080A7E8472B:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId:
+        Fn::GetAtt:
+          - AlbSvcLBSecurityGroupE09A4D3B
+          - GroupId
+      IpProtocol: tcp
+      Description: Load balancer to target
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - AlbSvcServiceSecurityGroup1BBD7858
+          - GroupId
+      FromPort: 8080
+      ToPort: 8080
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/LB/SecurityGroup/to CoffeeShopCodePipelineAlbSvcServiceSecurityGroup2E4832AC:8080
+  AlbSvcLBPublicListener03524FBB:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: AlbSvcLBPublicListenerECSGroupB7EFC8A8
+          Type: forward
+      LoadBalancerArn:
+        Ref: AlbSvcLB283AF851
+      Port: 80
+      Protocol: HTTP
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/LB/PublicListener/Resource
+  AlbSvcLBPublicListenerECSGroupB7EFC8A8:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 5
+      HealthCheckTimeoutSeconds: 4
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+      Port: 80
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+      TargetType: ip
+      UnhealthyThresholdCount: 3
+      VpcId: vpc-01edd8dfac7dc7e27
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/LB/PublicListener/ECSGroup/Resource
+  AlbSvcServiceD2C1E21D:
+    Type: AWS::ECS::Service
+    Properties:
+      TaskDefinition:
+        Ref: orderswebTask836C0A2C
+      Cluster:
+        Ref: ClusterEB0386A7
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: defaultContainer
+          ContainerPort: 8080
+          TargetGroupArn:
+            Ref: AlbSvcLBPublicListenerECSGroupB7EFC8A8
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - AlbSvcServiceSecurityGroup1BBD7858
+                - GroupId
+          Subnets:
+            - subnet-0ae13b56ad5af18c6
+            - subnet-0a2cb9eceec509d9b
+            - subnet-0ab4c461aaf45a383
+    DependsOn:
+      - AlbSvcLBPublicListenerECSGroupB7EFC8A8
+      - AlbSvcLBPublicListener03524FBB
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/Service/Service
+  AlbSvcServiceSecurityGroup1BBD7858:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CoffeeShopCodePipeline/AlbSvc/Service/SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId: vpc-01edd8dfac7dc7e27
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/Service/SecurityGroup/Resource
+  AlbSvcServiceSecurityGroupfromCoffeeShopCodePipelineAlbSvcLBSecurityGroupCA80C6D280807AA1FB5C:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: Load balancer to target
+      FromPort: 8080
+      GroupId:
+        Fn::GetAtt:
+          - AlbSvcServiceSecurityGroup1BBD7858
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - AlbSvcLBSecurityGroupE09A4D3B
+          - GroupId
+      ToPort: 8080
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/AlbSvc/Service/SecurityGroup/from CoffeeShopCodePipelineAlbSvcLBSecurityGroupCA80C6D2:8080
+  Order702A5B72:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: seqNo
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: seqNo
+          AttributeType: "N"
+      BillingMode: PAY_PER_REQUEST
+      TableName: Order
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/Order/Resource
+  CoffeeE126F75C:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: seqNo
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: seqNo
+          AttributeType: "N"
+      BillingMode: PAY_PER_REQUEST
+      TableName: Coffee
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/Coffee/Resource
+  EventBus7B8748AA:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: coffeeshop-event-bus
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/EventBus/Resource
+  OrderCreatedRule8ABB232A:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName:
+        Ref: EventBus7B8748AA
+      EventPattern:
+        source:
+          - '{"detail-type": [ "customevent" ],"source": ["solid.humank.coffeeshop.order"]}'
+      Name: OrderCreatedRule
+      State: ENABLED
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/OrderCreatedRule/Resource
+  eventSourceParamCF505C7B:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Value: solid.humank.coffeeshop.order
+      Name: /coffeeshop/events/ordercreated/event_source
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/eventSourceParam/Resource
+  eventArnParam2D3A232C:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - OrderCreatedRule8ABB232A
+          - Arn
+      Name: /coffeeshop/events/ordercreated/event_arn
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/eventArnParam/Resource
+  CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160:
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Statement:
+          - Action:
+              - kms:Create*
+              - kms:Describe*
+              - kms:Enable*
+              - kms:List*
+              - kms:Put*
+              - kms:Update*
+              - kms:Revoke*
+              - kms:Disable*
+              - kms:Get*
+              - kms:Delete*
+              - kms:ScheduleKeyDeletion
+              - kms:CancelKeyDeletion
+              - kms:GenerateDataKey
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::584518143473:root
+            Resource: "*"
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineRole48A82A35
+                  - Arn
+            Resource: "*"
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineSourceCodeCommitCodePipelineActionRole2D2B6146
+                  - Arn
+            Resource: "*"
+          - Action:
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineSourceECRCodePipelineActionRole20F0D41D
+                  - Arn
+            Resource: "*"
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineDeployDeployActionCodePipelineActionRole2A253EFB
+                  - Arn
+            Resource: "*"
+        Version: "2012-10-17"
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/ArtifactsBucketEncryptionKey/Resource
+  CoffeeShopPipelineArtifactsBucketCD86EDE3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              KMSMasterKeyID:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+                  - Arn
+              SSEAlgorithm: aws:kms
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/ArtifactsBucket/Resource
+  CoffeeShopPipelineArtifactsBucketEncryptionKeyAlias04604E8A:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/codepipeline-coffeeshopcodepipelinecoffeeshoppipeline2276f00d
+      TargetKeyId:
+        Fn::GetAtt:
+          - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+          - Arn
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/ArtifactsBucketEncryptionKeyAlias/Resource
+  CoffeeShopPipelineRole48A82A35:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Role/Resource
+  CoffeeShopPipelineRoleDefaultPolicyBF8CE454:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+                - Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineSourceCodeCommitCodePipelineActionRole2D2B6146
+                - Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineSourceECRCodePipelineActionRole20F0D41D
+                - Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineDeployDeployActionCodePipelineActionRole2A253EFB
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CoffeeShopPipelineRoleDefaultPolicyBF8CE454
+      Roles:
+        - Ref: CoffeeShopPipelineRole48A82A35
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Role/DefaultPolicy/Resource
+  CoffeeShopPipeline5BE09743:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn:
+        Fn::GetAtt:
+          - CoffeeShopPipelineRole48A82A35
+          - Arn
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: "1"
+              Configuration:
+                RepositoryName:
+                  Fn::GetAtt:
+                    - GitRepoA897C5EB
+                    - Name
+                BranchName: master
+                PollForSourceChanges: false
+              Name: CodeCommit
+              OutputArtifacts:
+                - Name: Artifact_Source_CodeCommit
+              RoleArn:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineSourceCodeCommitCodePipelineActionRole2D2B6146
+                  - Arn
+              RunOrder: 1
+            - ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: ECR
+                Version: "1"
+              Configuration:
+                RepositoryName:
+                  Ref: Repository22E53BBD
+                ImageTag: latest
+              Name: ECR
+              OutputArtifacts:
+                - Name: Artifact_Source_ECR
+              RoleArn:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineSourceECRCodePipelineActionRole20F0D41D
+                  - Arn
+              RunOrder: 1
+          Name: Source
+        - Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: ECS
+                Version: "1"
+              Configuration:
+                ClusterName:
+                  Ref: ClusterEB0386A7
+                ServiceName:
+                  Fn::GetAtt:
+                    - AlbSvcServiceD2C1E21D
+                    - Name
+              InputArtifacts:
+                - Name: Artifact_Source_CodeCommit
+              Name: DeployAction
+              RoleArn:
+                Fn::GetAtt:
+                  - CoffeeShopPipelineDeployDeployActionCodePipelineActionRole2A253EFB
+                  - Arn
+              RunOrder: 1
+          Name: Deploy
+      ArtifactStore:
+        EncryptionKey:
+          Id:
+            Fn::GetAtt:
+              - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+              - Arn
+          Type: KMS
+        Location:
+          Ref: CoffeeShopPipelineArtifactsBucketCD86EDE3
+        Type: S3
+      Name: CoffeeShopPipeline
+    DependsOn:
+      - CoffeeShopPipelineRoleDefaultPolicyBF8CE454
+      - CoffeeShopPipelineRole48A82A35
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Resource
+  CoffeeShopPipelineSourceCodeCommitCodePipelineActionRole2D2B6146:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::584518143473:root
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Source/CodeCommit/CodePipelineActionRole/Resource
+  CoffeeShopPipelineSourceCodeCommitCodePipelineActionRoleDefaultPolicyED587C4B:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+                - Arn
+          - Action:
+              - codecommit:GetBranch
+              - codecommit:GetCommit
+              - codecommit:UploadArchive
+              - codecommit:GetUploadArchiveStatus
+              - codecommit:CancelUploadArchive
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - GitRepoA897C5EB
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CoffeeShopPipelineSourceCodeCommitCodePipelineActionRoleDefaultPolicyED587C4B
+      Roles:
+        - Ref: CoffeeShopPipelineSourceCodeCommitCodePipelineActionRole2D2B6146
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Source/CodeCommit/CodePipelineActionRole/DefaultPolicy/Resource
+  CoffeeShopPipelineSourceECRCodePipelineActionRole20F0D41D:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::584518143473:root
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Source/ECR/CodePipelineActionRole/Resource
+  CoffeeShopPipelineSourceECRCodePipelineActionRoleDefaultPolicyC1F9729E:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: ecr:DescribeImages
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - Repository22E53BBD
+                - Arn
+          - Action:
+              - s3:DeleteObject*
+              - s3:PutObject*
+              - s3:Abort*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Encrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CoffeeShopPipelineSourceECRCodePipelineActionRoleDefaultPolicyC1F9729E
+      Roles:
+        - Ref: CoffeeShopPipelineSourceECRCodePipelineActionRole20F0D41D
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Source/ECR/CodePipelineActionRole/DefaultPolicy/Resource
+  CoffeeShopPipelineEventsRole899656A8:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/EventsRole/Resource
+  CoffeeShopPipelineEventsRoleDefaultPolicy89933727:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: codepipeline:StartPipelineExecution
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":codepipeline:us-west-2:584518143473:"
+                  - Ref: CoffeeShopPipeline5BE09743
+        Version: "2012-10-17"
+      PolicyName: CoffeeShopPipelineEventsRoleDefaultPolicy89933727
+      Roles:
+        - Ref: CoffeeShopPipelineEventsRole899656A8
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/EventsRole/DefaultPolicy/Resource
+  CoffeeShopPipelineDeployDeployActionCodePipelineActionRole2A253EFB:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::584518143473:root
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Deploy/DeployAction/CodePipelineActionRole/Resource
+  CoffeeShopPipelineDeployDeployActionCodePipelineActionRoleDefaultPolicy2557D5C6:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecs:DescribeServices
+              - ecs:DescribeTaskDefinition
+              - ecs:DescribeTasks
+              - ecs:ListTasks
+              - ecs:RegisterTaskDefinition
+              - ecs:UpdateService
+            Effect: Allow
+            Resource: "*"
+          - Action: iam:PassRole
+            Condition:
+              StringEqualsIfExists:
+                iam:PassedToService:
+                  - ec2.amazonaws.com
+                  - ecs-tasks.amazonaws.com
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - s3:GetObject*
+              - s3:GetBucket*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - CoffeeShopPipelineArtifactsBucketCD86EDE3
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CoffeeShopPipelineArtifactsBucketEncryptionKey9B04B160
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CoffeeShopPipelineDeployDeployActionCodePipelineActionRoleDefaultPolicy2557D5C6
+      Roles:
+        - Ref: CoffeeShopPipelineDeployDeployActionCodePipelineActionRole2A253EFB
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/CoffeeShopPipeline/Deploy/DeployAction/CodePipelineActionRole/DefaultPolicy/Resource
+  GitRepoA897C5EB:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: EventStormingWorkshop
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/GitRepo/Resource
+  GitRepoCoffeeShopCodePipelineCoffeeShopPipeline2276F00DEventRule291F572F:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.codecommit
+        resources:
+          - Fn::GetAtt:
+              - GitRepoA897C5EB
+              - Arn
+        detail-type:
+          - CodeCommit Repository State Change
+        detail:
+          event:
+            - referenceCreated
+            - referenceUpdated
+          referenceName:
+            - master
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::Join:
+              - ""
+              - - "arn:"
+                - Ref: AWS::Partition
+                - ":codepipeline:us-west-2:584518143473:"
+                - Ref: CoffeeShopPipeline5BE09743
+          Id: Target0
+          RoleArn:
+            Fn::GetAtt:
+              - CoffeeShopPipelineEventsRole899656A8
+              - Arn
+    Metadata:
+      aws:cdk:path: CoffeeShopCodePipeline/GitRepo/CoffeeShopCodePipelineCoffeeShopPipeline2276F00DEventRule/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.16.2,@aws-cdk/assets=1.17.1,@aws-cdk/aws-applicationautoscaling=1.17.1,@aws-cdk/aws-autoscaling=1.17.1,@aws-cdk/aws-autoscaling-common=1.17.1,@aws-cdk/aws-autoscaling-hooktargets=1.17.1,@aws-cdk/aws-certificatemanager=1.17.1,@aws-cdk/aws-cloudformation=1.17.1,@aws-cdk/aws-cloudwatch=1.17.1,@aws-cdk/aws-codebuild=1.17.1,@aws-cdk/aws-codecommit=1.17.1,@aws-cdk/aws-codepipeline=1.17.1,@aws-cdk/aws-codepipeline-actions=1.17.1,@aws-cdk/aws-dynamodb=1.17.1,@aws-cdk/aws-ec2=1.17.1,@aws-cdk/aws-ecr=1.17.1,@aws-cdk/aws-ecr-assets=1.17.1,@aws-cdk/aws-ecs=1.17.1,@aws-cdk/aws-ecs-patterns=1.17.1,@aws-cdk/aws-elasticloadbalancingv2=1.17.1,@aws-cdk/aws-events=1.17.1,@aws-cdk/aws-events-targets=1.17.1,@aws-cdk/aws-iam=1.17.1,@aws-cdk/aws-kms=1.17.1,@aws-cdk/aws-lambda=1.17.1,@aws-cdk/aws-logs=1.17.1,@aws-cdk/aws-route53=1.17.1,@aws-cdk/aws-route53-targets=1.17.1,@aws-cdk/aws-s3=1.17.1,@aws-cdk/aws-s3-assets=1.17.1,@aws-cdk/aws-servicediscovery=1.17.1,@aws-cdk/aws-sns=1.17.1,@aws-cdk/aws-sns-subscriptions=1.17.1,@aws-cdk/aws-sqs=1.17.1,@aws-cdk/aws-ssm=1.17.1,@aws-cdk/core=1.17.1,@aws-cdk/cx-api=1.17.1,@aws-cdk/region-info=1.17.1,jsii-runtime=node.js/v12.12.0
+Outputs:
+  AlbSvcLoadBalancerDNS20AA0F0B:
+    Value:
+      Fn::GetAtt:
+        - AlbSvcLB283AF851
+        - DNSName
+  AlbSvcServiceURL46A1D997:
+    Value:
+      Fn::Join:
+        - ""
+        - - http://
+          - Fn::GetAtt:
+              - AlbSvcLB283AF851
+              - DNSName
+  ServiceURL:
+    Value:
+      Fn::Join:
+        - ""
+        - - http://
+          - Fn::GetAtt:
+              - AlbSvcLB283AF851
+              - DNSName
+  StackId:
+    Value:
+      Ref: AWS::StackId
+  StackName:
+    Value: CoffeeShopCodePipeline
+  CodeCommitRepoName:
+    Value:
+      Fn::GetAtt:
+        - GitRepoA897C5EB
+        - Name
+  Hint:
+    Value:
+      Fn::Join:
+        - ""
+        - - >-
+            
+            Create a "imagedefinitions.json" file and git add/push into CodeCommit repository "EventStormingWorkshop" with the following value:
+
+
+            [
+              {
+                "name": "defaultContainer",
+                "imageUri": "
+          - Fn::Select:
+              - 4
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - Repository22E53BBD
+                      - Arn
+          - .dkr.ecr.
+          - Fn::Select:
+              - 3
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - Repository22E53BBD
+                      - Arn
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: Repository22E53BBD
+          - >
+            :latest"
+              }
+            ]
+  CodeBuildProjectName:
+    Value: CodeBuildProject
+  Bucket:
+    Value:
+      Ref: CoffeeShopBucketEF3ADD55
+
