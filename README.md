@@ -1,6 +1,6 @@
 # Designing Cloud Native Microservices on AWS  (via DDD/EventStormingWorkshop)
 
-![image](docs/img/coffee.jpg)   
+![image](docs/img/coffee.jpg) .         
 _Picture license-free from [Pexels](https://www.pexels.com/photo/background-beverage-breakfast-brown-414645/)_
 
 Building software is hard. Understanding the business needs of the software is even harder. In almost every software development project, there will always be some form of gap between the requirements of the business users and the actual implementation.
@@ -20,7 +20,6 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
 
 
 ## Table of Contents
-
 - [00 - Event Storming](#eventstorming)
   - [What is Event Storming?](#what-is-event-storming)
   - [Whom is it for?](#whom-is-it-for)
@@ -44,27 +43,24 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
   - [Implement Domain Model from code Skeleton](docs/04-modeling-and-development/README.md#implement-domain-model-from-code-skeleton)
   - [Design each Microservices in Port-adapter concept](docs/04-modeling-and-development/README.md#design-each-microservices-in-port-adapter-concept)
 - [05 - Deploy Applications by AWS CDK](docs/05-deploy-applications-by-cdk/README.md) 
-  <!---
+<!---
 - [05 - Domain Driven Design Tactical design pattern guidance](05-ddd-tactical-design-pattern)
 - [06 - Actual Implementation](06-actual-implementation)
 - [07 - Infrastructure as Code by CDK](07-iaac-cdk)
 - [08 - Deploy Serverless application](08-deploy-serverless-app)
 - [09 - Deploy Containerized application](09-deploy-containerized-app)
 - [10 - Build up CI/CD pipeline](10-build-up-cicd-pipeline)
-  --->
+--->
 
 # Event Storming
-
 ![image](docs/img/problemsolving.png)
 
 ## What is Event Storming?
-
 Event Storming is a **rapid**, **lightweight**, and often under-appreciated group modeling technique that is **intense**, **fun**, and **useful** to **accelerate** project teams. It is typically offered as an interactive **workshop** and it is a synthesis of facilitated group learning practices from Gamestorming, leveraging on the principles of Domain Driven Design (DDD).
 
 You can apply it practically on any technical or business domain, especially those that are large, complex, or both.
 
 ## Whom is it for?
-
 Event Storming isn't limited to just for the software development team. In fact, it is recommend to invite all the stakeholders, such as developers, domain experts, business decision makers etc to join the Event Storming workshop to collect viewpoints from each participants.
 
 ## Event Storming Terms
@@ -79,12 +75,12 @@ Take a look on this diagram, there are a few colored sticky notes with different
 * **Actions** aka Command (Blue sticky note) - Describes an *action* that caused the domain event. It is a request or intention, raised by a role or time or external system
 * **Information** (Green sticky note) - Describes the *supporting information* required to help make a decision to raise a command
 * **Consistent Business Rules** aka Aggregate (Yellow sticky note)
-  * Groups of Events or Actions that represent a specific business capability
-  * Has the responsibility to accept or fulfill the intention of command
-  * Should be in small scope
-  * And communicated by eventual consistency
+    * Groups of Events or Actions that represent a specific business capability
+    * Has the responsibility to accept or fulfill the intention of command
+    * Should be in small scope
+    * And communicated by eventual consistency
 * **Eventual Consistent Business rules** aka Policy (Lilac sticky note)
-  * Represents a process or business rules. Can come from external regulation and restrictions e.g. account login success/fail process logic.
+    * Represents a process or business rules. Can come from external regulation and restrictions e.g. account login success/fail process logic.
 
 ## Event Storming Benefits
 
@@ -103,7 +99,6 @@ Business requirements can be very complex. It is often hard to find a fluent way
 ## Event Storming Applications
 
 There are many useful applications of Event Storming. The most obvious time to use event storming is at a project's inception, so the team can start with a common understanding of the domain model. Some other reasons include:
-
 * Discovering complexity early on, finding missing concepts, understanding the business process;
 * Modelling or solving a specific problem in detail;
 * Learning how to model and think about modelling.
@@ -111,6 +106,8 @@ There are many useful applications of Event Storming. The most obvious time to u
 Event Storming can also help to identify key views for your user interface, which can jump start Site Mapping or Wireframing.
 
 Let's get started with a quick example to demonstrate how to run a simple Event Storming.
+
+[Next: 01 Hands-on Events Exploring >](docs/01-hands-on-events-exploring/README.md)
 
 [Next: 01 Hands-on Events Exploring >](docs/01-hands-on-events-exploring/README.md)
 
