@@ -112,4 +112,4 @@ Let's get started with a quick example to demonstrate how to run a simple Event 
 
 ## License
 
-This library is licensed under the MIT-0 License. See the LICENSE file.docs/01-hands-on-events-exploring/README.md)
+This library is licensed under the MIT-0 License. See the LICENSE file.
