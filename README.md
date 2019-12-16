@@ -109,9 +109,6 @@ Let's get started with a quick example to demonstrate how to run a simple Event 
 
 [Next: 01 Hands-on Events Exploring >](docs/01-hands-on-events-exploring/README.md)
 
-[Next: 01 Hands-on Events Exploring >](docs/01-hands-on-events-exploring/README.md)
-
-
 
 ## License
 
