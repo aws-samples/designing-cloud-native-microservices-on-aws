@@ -56,7 +56,7 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
 ![image](docs/img/problemsolving.png)
 
 ## What is Event Storming?
-Event Storming is a **rapid**, **lightweight**, and often under-appreciated group modeling technique that is **intense**, **fun**, and **useful** to **accelerate** project teams. It is typically offered as an interactive **workshop** and it is a synthesis of facilitated group learning practices from Gamestorming, leveraging on the principles of Domain Driven Design (DDD).
+Event Storming is a **rapid**, **lightweight**, and often under-appreciated group modeling technique invented by Alberto Brandolini, that is **intense**, **fun**, and **useful** to **accelerate** project teams. It is typically offered as an interactive **workshop** and it is a synthesis of facilitated group learning practices from Gamestorming, leveraging on the principles of Domain Driven Design (DDD).
 
 You can apply it practically on any technical or business domain, especially those that are large, complex, or both.
 
