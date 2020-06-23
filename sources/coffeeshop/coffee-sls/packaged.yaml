@@ -4,7 +4,7 @@ Resources:
   AcceptOrderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: java8
+      Runtime: java11
       Handler: solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler::handleRequest
       Timeout: 30
       MemorySize: 128

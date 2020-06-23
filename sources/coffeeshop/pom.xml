@@ -13,31 +13,28 @@
 
     <!-- properties -->
     <properties>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <junit5.version>5.5.2</junit5.version>
-        <junit.platform.version>1.5.2</junit.platform.version>
-        <lombok.version>1.18.10</lombok.version>
-        <quarkus.version>1.0.0.CR1</quarkus.version>
+        <junit5.version>5.6.2</junit5.version>
+        <junit.platform.version>1.6.2</junit.platform.version>
+        <lombok.version>1.18.12</lombok.version>
+        <quarkus.version>1.5.2.Final</quarkus.version>
         <maven-surefire-plugin>2.22.2</maven-surefire-plugin>
-        <cucumber.java.version>4.8.0</cucumber.java.version>
-        <mockito.core.version>3.1.0</mockito.core.version>
+        <maven-compiler-plugin>3.8.1</maven-compiler-plugin>
+        <cucumber.java.version>6.1.1</cucumber.java.version>
+        <mockito.core.version>3.3.3</mockito.core.version>
         <!-- settings for aws -->
-        <aws-java-sdk-bom>1.11.641</aws-java-sdk-bom>
-        <software.amazon.awssdk>2.9.13</software.amazon.awssdk>
-        <log4j.core>2.12.1</log4j.core>
-        <log4j.api>2.12.1</log4j.api>
-        <log4j.slf4j.impl>2.12.1</log4j.slf4j.impl>
-        <jackson.version>2.9.10.20191020</jackson.version>
+        <aws-java-sdk-bom>1.11.807</aws-java-sdk-bom>
+        <software.amazon.awssdk>2.13.41</software.amazon.awssdk>
+        <log4j.core>2.13.3</log4j.core>
+        <log4j.api>2.13.3</log4j.api>
+        <log4j.slf4j.impl>2.13.3</log4j.slf4j.impl>
+        <jackson.version>2.11.0</jackson.version>
 
-        <!--        <surefire-plugin.version>2.22.0</surefire-plugin.version>-->
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>1.8</maven.compiler.target>
-
     </properties>
 
     <!-- sub modules -->

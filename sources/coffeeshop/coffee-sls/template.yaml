@@ -4,12 +4,12 @@ Resources:
   AcceptOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Runtime: java8
+      Runtime: java11
       Handler: solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler::handleRequest
       # Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       FunctionName: coffee-sls-OrderCreatedHandler
       Timeout: 30
-      MemorySize: 512
+      MemorySize: 1024
       CodeUri: target/coffee-sls-1.0-SNAPSHOT.jar
       Policies:
         - AmazonDynamoDBFullAccess

@@ -28,12 +28,16 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
-      <version>1.0.0.CR1</version>
+      <version>1.5.2.Final</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
           <artifactId>quarkus-bootstrap-core</artifactId>
           <groupId>io.quarkus</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>org.eclipse.sisu.inject</artifactId>
+          <groupId>org.eclipse.sisu</groupId>
         </exclusion>
         <exclusion>
           <artifactId>quarkus-test-common</artifactId>
@@ -43,12 +47,16 @@
           <artifactId>junit-jupiter</artifactId>
           <groupId>org.junit.jupiter</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>xstream</artifactId>
+          <groupId>com.thoughtworks.xstream</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>4.1.1</version>
+      <version>4.3.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -104,7 +112,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.5.2</version>
+      <version>5.6.2</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -124,7 +132,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-runner</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -148,11 +156,11 @@
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java8</artifactId>
-      <version>4.8.0</version>
+      <version>6.1.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <artifactId>cucumber-java</artifactId>
+          <artifactId>cucumber-core</artifactId>
           <groupId>io.cucumber</groupId>
         </exclusion>
         <exclusion>
@@ -168,7 +176,7 @@
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
-      <version>4.8.0</version>
+      <version>6.1.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -188,7 +196,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.1.0</version>
+      <version>3.3.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -207,7 +215,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 </project>
