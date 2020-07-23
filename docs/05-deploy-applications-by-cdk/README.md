@@ -93,6 +93,8 @@ Open the AWS Codebuild console, and click the **Create build project**, we will 
 ```shell script
 cd deployment/coffeeshop-cdk
 
+npm install
+
 npm run build 
 
 cdk synth
