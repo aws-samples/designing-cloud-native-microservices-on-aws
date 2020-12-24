@@ -30,10 +30,10 @@
     "@aws-cdk/aws-ecs-patterns": "^1.30.0",
     "@aws-cdk/aws-elasticloadbalancingv2": "^1.30.0",
     "@aws-cdk/aws-events": "^1.30.0",
+    "@aws-cdk/aws-sam": "^1.30.0",
     "@aws-cdk/core": "^1.30.0",
     "@aws-cdk/cx-api": "^1.30.0",
     "@aws-cdk/region-info": "^1.30.0",
-    "@aws-cdk/aws-sam": "^1.30.0",
     "@types/node": "^12.12.7"
   }
 }
