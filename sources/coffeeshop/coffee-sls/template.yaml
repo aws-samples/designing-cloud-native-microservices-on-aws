@@ -13,7 +13,7 @@ Resources:
       CodeUri: target/coffee-sls-1.0-SNAPSHOT.jar
       Policies:
         - AmazonDynamoDBFullAccess
-        - AWSLambdaFullAccess
+        - AWSLambda_FullAccess
         - CloudWatchEventsFullAccess
       Events:
         PurchaseOrder:
