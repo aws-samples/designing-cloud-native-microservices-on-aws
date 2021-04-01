@@ -104,7 +104,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
                 phases: {
                     install:{
                         'runtime-versions': {
-                            java: 'corretto11'
+                            java: 'corretto8'
                         }
                     },
                     build: {
