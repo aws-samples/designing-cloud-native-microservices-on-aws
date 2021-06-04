@@ -93,6 +93,8 @@ Open the AWS Codebuild console, and click the **Create build project**, we will 
 ```shell script
 cd deployment/coffeeshop-cdk
 
+npm install
+
 npm run build 
 
 cdk synth
@@ -137,23 +139,24 @@ Stack ARN:
 arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShopCodePipeline/f10c0520-0618-11ea-8122-023709c486f0
 ```
 
-Do remember to create a "imagedefinitions.json" file and git add/push into CodeCommit repository "EventStormingWorkshop" with the following value:
+Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/codepipeline/latest/userguide/file-reference.html#pipelines-create-image-definitions) file and git add/push into CodeCommit repository "EventStormingWorkshop" (that has been created as part of the deployment above) with the following value:
 
+```
 [
   {
     "name": "defaultContainer",
     "imageUri": "your ecr repository arn for this coffeeshop/solid-humank-coffeeshop/orders-web:latest"
   }
 ]
-
+```
 
 
 ### Way to Deploy applications 
 
 You could deploy these applications via two approach: 
 
-1. At first time, self manually deploy application in Codebuild service, just to select the codebuild project and click the **start build** button,  then the deployment process will be started.
-2. Anytime, if you make any chang on the EventStormingWorkshop repository on github, while you commit and push  to  master branch, then the CodeBuild service will automatically buid it and trigger the codepipeline to deploy all these applications.
+1. At first time, self manually deploy application in CodeBuild service, just to select the CodeBuild project and click the **start build** button, then the deployment process will be started.
+2. Anytime, if you make any chang on the EventStormingWorkshop repository on github, while you commit and push  to  master branch, then the CodeBuild service will automatically build it and trigger the codepipeline to deploy all these applications.
 
 ### Setup Lambda function trigger with EventBridge
 
@@ -225,5 +228,5 @@ REPORT RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc	Duration: 8150.39 ms	Bill
 
 
 
-Now,  you have go through all ofthe whole coffee ordering process journey, in case you would like to hands-on more, just implement more business scenario as you can, and taste all these **Cloud coffeeshop on AWS.**
+Now, you have gone through all of the whole coffee ordering process journey, in case you would like to hands-on more, just implement more business scenario as you can, and taste all these **Cloud coffeeshop on AWS.**
 

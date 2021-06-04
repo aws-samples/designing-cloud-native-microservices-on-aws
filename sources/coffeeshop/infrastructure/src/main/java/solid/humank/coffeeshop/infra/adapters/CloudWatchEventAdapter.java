@@ -40,7 +40,7 @@ public class CloudWatchEventAdapter {
     }
 
     private PublishResult putEvent(String eventContent) {
-
+        //add a comment for test AWS codeGuru
         CloudWatchEventsClient cwe = CloudWatchEventsClient.builder().httpClientBuilder(UrlConnectionHttpClient.builder())
                 .build();
 

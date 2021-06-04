@@ -14,6 +14,7 @@ import {Duration} from '@aws-cdk/core';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import {Rule} from "@aws-cdk/aws-events";
 import * as ssm from '@aws-cdk/aws-ssm';
+import { UlimitName } from '@aws-cdk/aws-ecs';
 
 const DOCKER_IMAGE_PREFIX = 'solid-humank-coffeeshop/orders-web'
 const CODECOMMIT_REPO_NAME = 'EventStormingWorkshop'
@@ -166,14 +167,23 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             compatibility: ecs.Compatibility.FARGATE,
             memoryMiB: '512',
             cpu: '256',
+            
         });
 
-        taskDefinition.addContainer('defaultContainer', {
+        const containerDefinition = taskDefinition.addContainer('defaultContainer', {
             image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
             logging: new ecs.AwsLogDriver({
                 streamPrefix: 'coffeeshop',
             })
-        }).addPortMappings({
+        });
+
+        containerDefinition.addUlimits({
+            name: UlimitName.NOFILE,
+            softLimit:102400 ,
+            hardLimit: 819200
+        });
+
+        containerDefinition.addPortMappings({
             containerPort: 8080
         });
 

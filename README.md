@@ -1,6 +1,6 @@
 # Designing Cloud Native Microservices on AWS  (via DDD/EventStormingWorkshop)
 
-![image](docs/img/coffee.jpg) .         
+![](docs/img/coffee.jpg)
 _Picture license-free from [Pexels](https://www.pexels.com/photo/background-beverage-breakfast-brown-414645/)_
 
 Building software is hard. Understanding the business needs of the software is even harder. In almost every software development project, there will always be some form of gap between the requirements of the business users and the actual implementation.

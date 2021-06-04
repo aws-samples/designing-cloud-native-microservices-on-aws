@@ -34,8 +34,9 @@ public class OrderRepository implements IOrderRepository {
     }
 
     public OrderId generateOrderId() {
-
-        return new OrderId(this.repository.count(new OrderRepoSpec()) + 1, OffsetDateTime.now());
+        //return new OrderId(this.repository.count(new OrderRepoSpec()) + 1, OffsetDateTime.now());
+        OffsetDateTime now = OffsetDateTime.now();
+        return new OrderId(now.toEpochSecond(), now);
     }
 
     @Override

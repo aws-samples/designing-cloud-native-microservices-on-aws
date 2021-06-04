@@ -44,8 +44,6 @@ public class DomainModelMapper {
             result = mapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return result;
     }

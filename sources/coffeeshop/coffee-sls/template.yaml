@@ -4,16 +4,16 @@ Resources:
   AcceptOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Runtime: java8
+      Runtime: java11
       Handler: solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler::handleRequest
       # Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       FunctionName: coffee-sls-OrderCreatedHandler
       Timeout: 30
-      MemorySize: 512
+      MemorySize: 1024
       CodeUri: target/coffee-sls-1.0-SNAPSHOT.jar
       Policies:
         - AmazonDynamoDBFullAccess
-        - AWSLambdaFullAccess
+        - AWSLambda_FullAccess
         - CloudWatchEventsFullAccess
       Events:
         PurchaseOrder:
@@ -28,4 +28,4 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/order"
   AcceptOrderFunction:
     Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt AcceptOrderFunction.Arn
+    Value: !GetAtt AcceptOrder.Arn
