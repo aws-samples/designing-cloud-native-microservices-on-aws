@@ -35,6 +35,7 @@
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <archunit.version>0.21.0</archunit.version>
     </properties>
 
     <!-- sub modules -->
@@ -83,6 +84,12 @@
 
     <!-- dependencies -->
     <dependencies>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>

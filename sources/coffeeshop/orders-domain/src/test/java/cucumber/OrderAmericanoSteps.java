@@ -27,7 +27,7 @@ public class OrderAmericanoSteps implements En {
             Map<String, String> sample = testData.get(0);
 
             String productId = sample.get("coffee");
-            int qty = Integer.valueOf(sample.get("quantity"));
+            int qty = Integer.parseInt(sample.get("quantity"));
             BigDecimal price = new BigDecimal(sample.get("price"));
 
             List<OrderItem> items = new ArrayList<>();
