@@ -26,6 +26,12 @@
   </build>
   <dependencies>
     <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <version>0.21.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
       <version>1.5.2.Final</version>
@@ -42,10 +48,6 @@
         <exclusion>
           <artifactId>quarkus-test-common</artifactId>
           <groupId>io.quarkus</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit-jupiter</artifactId>
-          <groupId>org.junit.jupiter</groupId>
         </exclusion>
         <exclusion>
           <artifactId>xstream</artifactId>
@@ -111,20 +113,20 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.6.2</version>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.7.2</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <artifactId>apiguardian-api</artifactId>
-          <groupId>org.apiguardian</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit-platform-engine</artifactId>
-          <groupId>org.junit.platform</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>junit-jupiter-api</artifactId>
+          <groupId>org.junit.jupiter</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-jupiter-params</artifactId>
+          <groupId>org.junit.jupiter</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-jupiter-engine</artifactId>
           <groupId>org.junit.jupiter</groupId>
         </exclusion>
       </exclusions>
@@ -140,6 +142,10 @@
           <groupId>junit</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>junit-platform-launcher</artifactId>
           <groupId>org.junit.platform</groupId>
         </exclusion>
@@ -147,16 +153,12 @@
           <artifactId>junit-platform-suite-api</artifactId>
           <groupId>org.junit.platform</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>apiguardian-api</artifactId>
-          <groupId>org.apiguardian</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java8</artifactId>
-      <version>6.1.1</version>
+      <version>6.10.4</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -176,7 +178,7 @@
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
-      <version>6.1.1</version>
+      <version>6.10.4</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -190,6 +192,22 @@
         <exclusion>
           <artifactId>apiguardian-api</artifactId>
           <groupId>org.apiguardian</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <version>6.10.4</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit-platform-engine</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>cucumber-core</artifactId>
+          <groupId>io.cucumber</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -215,7 +233,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 </project>

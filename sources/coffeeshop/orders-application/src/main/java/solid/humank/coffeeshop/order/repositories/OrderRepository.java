@@ -42,6 +42,7 @@ public class OrderRepository implements IOrderRepository {
     @Override
     public Order getBy(OrderId id) {
 
+
         return this.repository.get(id);
     }
 }

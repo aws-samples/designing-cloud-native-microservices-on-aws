@@ -1,4 +1,4 @@
-package cucumber;
+package solid.humank.coffeeshop.order.cucumber;
 
 import io.cucumber.java8.En;
 import solid.humank.coffeeshop.order.commands.CreateOrder;

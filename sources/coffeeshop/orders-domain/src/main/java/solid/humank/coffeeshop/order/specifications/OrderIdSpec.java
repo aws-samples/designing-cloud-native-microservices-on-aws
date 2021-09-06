@@ -13,3 +13,5 @@ public class OrderIdSpec extends Specification<OrderId> {
         this.predicate = oid -> Pattern.matches(pattern, oid.toString());
     }
 }
+
+

@@ -17,13 +17,13 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit5.version>5.6.2</junit5.version>
+        <junit5.version>5.7.2</junit5.version>
         <junit.platform.version>1.6.2</junit.platform.version>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.20</lombok.version>
         <quarkus.version>1.5.2.Final</quarkus.version>
         <maven-surefire-plugin>2.22.2</maven-surefire-plugin>
         <maven-compiler-plugin>3.8.1</maven-compiler-plugin>
-        <cucumber.java.version>6.1.1</cucumber.java.version>
+        <cucumber.java.version>6.10.4</cucumber.java.version>
         <mockito.core.version>3.3.3</mockito.core.version>
         <!-- settings for aws -->
         <aws-java-sdk-bom>1.11.807</aws-java-sdk-bom>
@@ -34,7 +34,6 @@
         <jackson.version>2.11.0</jackson.version>
 
         <maven.compiler.parameters>true</maven.compiler.parameters>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <archunit.version>0.21.0</archunit.version>
     </properties>
 
@@ -119,18 +118,16 @@
         <!-- unit test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${junit5.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
             <version>${junit.platform.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java8</artifactId>
@@ -142,6 +139,12 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
             <version>${cucumber.java.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>6.10.4</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
@@ -159,23 +162,19 @@
             <version>${lombok.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>com.fasterxml.jackson.module</groupId>-->
-        <!--            <artifactId>jackson-module-parameter-names</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->
-        <!--            <artifactId>jackson-datatype-jdk8</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->
-        <!--            <artifactId>jackson-datatype-jsr310</artifactId>-->
-        <!--        </dependency>-->
     </dependencies>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin}</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
