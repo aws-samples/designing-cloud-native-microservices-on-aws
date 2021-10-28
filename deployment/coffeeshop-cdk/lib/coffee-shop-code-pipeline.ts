@@ -16,8 +16,8 @@ import {Rule} from "@aws-cdk/aws-events";
 import * as ssm from '@aws-cdk/aws-ssm';
 import { UlimitName } from '@aws-cdk/aws-ecs';
 
-const DOCKER_IMAGE_PREFIX = 'solid-humank-coffeeshop/orders-web'
-const CODECOMMIT_REPO_NAME = 'EventStormingWorkshop'
+const DOCKER_IMAGE_PREFIX = 'coffeeshop/orders-web'
+const CODECOMMIT_REPO_NAME = 'designing-cloud-native-microservices-on-aws'
 
 export class CoffeeShopCodePipeline extends cdk.Stack {
 
@@ -68,7 +68,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
 
         const defaultSource = codebuild.Source.gitHub({
             owner: 'humank',
-            repo: 'EventStormingWorkShop',
+            repo: 'designing-cloud-native-microservices-on-aws',
             webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
             webhookFilters: [
                 codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),

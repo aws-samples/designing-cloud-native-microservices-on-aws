@@ -1,5 +1,5 @@
 {"webhook":
-{"name": "EventStormingWorkshop-webhook",
+{"name": "designing-cloud-native-microservices-on-aws",
   "targetPipeline": "CoffeeShopPipeline",
   "targetAction": "source_action_name",
   "filters": [

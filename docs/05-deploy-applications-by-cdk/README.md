@@ -25,7 +25,7 @@ This workshop will leverage Github webhook mechanism to automatically build / de
 
 Besides, please also update the repo owner information in theis source code:
 
-**EventStormingWorkShop/deployment/coffeeshop-cdk/lib/coffee-shop-code-pipeline.ts**
+**designing-cloud-native-microservices-on-aws/deployment/coffeeshop-cdk/lib/coffee-shop-code-pipeline.ts**
 
 
 
@@ -34,7 +34,7 @@ Besides, please also update the repo owner information in theis source code:
 ```typescript
 const defaultSource = codebuild.Source.gitHub({
             owner: 'humank',
-            repo: 'EventStormingWorkShop',
+            repo: 'designing-cloud-native-microservices-on-aws',
             webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
             webhookFilters: [
                 codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),
@@ -120,17 +120,18 @@ CoffeeShopCodePipeline.CodeBuildProjectName = CodeBuildProject
 CoffeeShopCodePipeline.AlbSvcServiceURL46A1D997 = http://Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
 CoffeeShopCodePipeline.AlbSvcLoadBalancerDNS20AA0F0B = Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
 CoffeeShopCodePipeline.Hint =
-Create a "imagedefinitions.json" file and git add/push into CodeCommit repository "EventStormingWorkshop" with the following value:
+Create a "imagedefinitions.json" file and git add/push into CodeCommit repository "designing-cloud-native-microservices-on-aws
+" with the following value:
 
 [
   {
     "name": "defaultContainer",
-    "imageUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/solid-humank-coffeeshop/orders-web:latest"
+    "imageUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest"
   }
 ]
 
 CoffeeShopCodePipeline.Bucket = coffeeshop-nypea
-CoffeeShopCodePipeline.CodeCommitRepoName = EventStormingWorkshop
+CoffeeShopCodePipeline.CodeCommitRepoName = designing-cloud-native-microservices-on-aws
 CoffeeShopCodePipeline.ServiceURL = http://Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
 CoffeeShopCodePipeline.StackName = CoffeeShopCodePipeline
 CoffeeShopCodePipeline.StackId = arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShopCodePipeline/f10c0520-0618-11ea-8122-023709c486f0
@@ -139,7 +140,8 @@ Stack ARN:
 arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShopCodePipeline/f10c0520-0618-11ea-8122-023709c486f0
 ```
 
-Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/codepipeline/latest/userguide/file-reference.html#pipelines-create-image-definitions) file and git add/push into CodeCommit repository "EventStormingWorkshop" (that has been created as part of the deployment above) with the following value:
+Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/codepipeline/latest/userguide/file-reference.html#pipelines-create-image-definitions) file and git add/push into CodeCommit repository "designing-cloud-native-microservices-on-aws
+" (that has been created as part of the deployment above) with the following value:
 
 ```
 [
@@ -156,7 +158,7 @@ Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/co
 You could deploy these applications via two approach: 
 
 1. At first time, self manually deploy application in CodeBuild service, just to select the CodeBuild project and click the **start build** button, then the deployment process will be started.
-2. Anytime, if you make any chang on the EventStormingWorkshop repository on github, while you commit and push  to  master branch, then the CodeBuild service will automatically build it and trigger the codepipeline to deploy all these applications.
+2. Anytime, if you make any chang on the designing-cloud-native-microservices-on-aws repository on github, while you commit and push  to  master branch, then the CodeBuild service will automatically build it and trigger the codepipeline to deploy all these applications.
 
 ### Setup Lambda function trigger with EventBridge
 
