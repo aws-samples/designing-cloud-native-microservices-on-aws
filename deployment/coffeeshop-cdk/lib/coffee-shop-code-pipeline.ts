@@ -3,7 +3,7 @@ import * as ecr from '@aws-cdk/aws-ecr';
 import * as iam from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
 import ec2 = require('@aws-cdk/aws-ec2');
-import * as codebuild  from '@aws-cdk/aws-codebuild';
+import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as ecs from '@aws-cdk/aws-ecs';
@@ -14,7 +14,7 @@ import {Duration} from '@aws-cdk/core';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import {Rule} from "@aws-cdk/aws-events";
 import * as ssm from '@aws-cdk/aws-ssm';
-import { UlimitName } from '@aws-cdk/aws-ecs';
+import {UlimitName} from '@aws-cdk/aws-ecs';
 
 const DOCKER_IMAGE_PREFIX = 'coffeeshop/orders-web'
 const CODECOMMIT_REPO_NAME = 'designing-cloud-native-microservices-on-aws'
@@ -22,6 +22,7 @@ const CODECOMMIT_REPO_NAME = 'designing-cloud-native-microservices-on-aws'
 export class CoffeeShopCodePipeline extends cdk.Stack {
 
     readonly ecrRepository: ecr.Repository
+
     // @ts-ignore
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
@@ -74,13 +75,16 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
                 codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),
             ], // optional, by default all pushes and Pull Requests will trigger a build
         });
+        let bucketName = 'coffeeshop';
+        let coffeeShopBucket = s3.Bucket.fromBucketName(this, 'CoffeeShopBucket', 'coffeeshop');
+        if (coffeeShopBucket == null) {
+            coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
+                bucketName: bucketName,
+                removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
+            });
+        }
 
         //let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
-        let bucketName = 'coffeeshop';
-        const coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
-            bucketName: bucketName,
-            removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
-        });
 
         coffeeShopBucket.grantPut(buildRole);
         coffeeShopBucket.grantRead(buildRole);
@@ -98,12 +102,12 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             },
             buildSpec: codebuild.BuildSpec.fromObject({
                 version: 0.2,
-                cache:{
+                cache: {
                     paths:
-                        - '/root/.m2/**/*'
+                        -'/root/.m2/**/*'
                 },
                 phases: {
-                    install:{
+                    install: {
                         'runtime-versions': {
                             java: 'corretto8'
                         }
@@ -135,7 +139,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
 
                             'echo package coffee serverless lambda function',
                             'cd ../coffee-sls',
-                            'sam package --template-file template.yaml --s3-bucket '+ bucketName + ' --output-template-file packaged.yaml',
+                            'sam package --template-file template.yaml --s3-bucket ' + bucketName + ' --output-template-file packaged.yaml',
                             'sam deploy --template-file ./packaged.yaml --stack-name coffee-sls --capabilities CAPABILITY_IAM',
                         ]
 
@@ -154,11 +158,12 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             compatibility: ecs.Compatibility.FARGATE,
             memoryMiB: '512',
             cpu: '256',
-            
+
         });
 
-        const containerDefinition = taskDefinition.addContainer('defaultContainer', {
-            image: ecs.ContainerImage.fromRegistry('584518143473.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest'),
+        const containerDefinition = taskDefinition.addContainer('orders-web-Container', {
+            //image: ecs.ContainerImage.fromRegistry('584518143473.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest'),
+            image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
             logging: new ecs.AwsLogDriver({
                 streamPrefix: 'coffeeshop',
             })
@@ -166,7 +171,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
 
         containerDefinition.addUlimits({
             name: UlimitName.NOFILE,
-            softLimit:102400 ,
+            softLimit: 102400,
             hardLimit: 819200
         });
 
@@ -185,7 +190,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             actions: ['events:*']
         }));
         const orderTable = new dynamodb.Table(this, 'Order', {
-            partitionKey: { name: 'seqNo', type: dynamodb.AttributeType.NUMBER },
+            partitionKey: {name: 'seqNo', type: dynamodb.AttributeType.NUMBER},
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
             tableName: 'Order',
         });
@@ -193,17 +198,17 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
         orderTable.grantFullAccess(fargateTaskRole);
 
         const coffeeTable = new dynamodb.Table(this, 'Coffee', {
-            partitionKey: { name: 'seqNo', type: dynamodb.AttributeType.NUMBER },
+            partitionKey: {name: 'seqNo', type: dynamodb.AttributeType.NUMBER},
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
             tableName: 'Coffee',
         });
 
         coffeeTable.grantFullAccess(fargateTaskRole);
 
-        const rule = new Rule(this, 'OrderCreatedRule',{
-            eventPattern:{
-                source:["solid.humank.coffeeshop.order"],
-                detailType:['customevent']
+        const rule = new Rule(this, 'OrderCreatedRule', {
+            eventPattern: {
+                source: ["solid.humank.coffeeshop.order"],
+                detailType: ['customevent']
             },
             // eventBus: coffeeshop_eventbus,
             ruleName: 'OrderCreatedRule',
@@ -312,7 +317,7 @@ Create a "imagedefinitions.json" file and git add/push into CodeCommit repositor
 
 [
   {
-    "name": "defaultContainer",
+    "name": "orders-web-Container",
     "imageUri": "${this.ecrRepository.repositoryUri}:latest"
   }
 ]
@@ -325,7 +330,7 @@ Create a "imagedefinitions.json" file and git add/push into CodeCommit repositor
             value: CodeBuildProject.name
         })
 
-        new cdk.CfnOutput(this, 'Bucket', { value: coffeeShopBucket.bucketName });
+        new cdk.CfnOutput(this, 'Bucket', {value: coffeeShopBucket.bucketName});
 
     }
 }
