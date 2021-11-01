@@ -72,7 +72,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             repo: 'designing-cloud-native-microservices-on-aws',
             webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
             webhookFilters: [
-                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),
+                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('main'),
             ], // optional, by default all pushes and Pull Requests will trigger a build
         });
         let bucketName = 'coffeeshop';
