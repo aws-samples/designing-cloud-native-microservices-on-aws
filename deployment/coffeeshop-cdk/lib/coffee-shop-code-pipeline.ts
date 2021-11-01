@@ -78,10 +78,6 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
         let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
         const coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
             bucketName: bucketName,
-            // The default removal policy is RETAIN, which means that cdk destroy will not attempt to delete
-            // the new bucket, and it will remain in your account until manually deleted. By setting the policy to
-            // DESTROY, cdk destroy will attempt to delete the bucket, but will error if the bucket is not empty.
-
             //removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
         });
 
