@@ -118,20 +118,17 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
                     post_build: {
                         commands: [
                             'TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}',
+                            'ACCOUNTID=$(aws sts get-caller-identity|jq -r ".Account")',
                             'LATEST="latest"',
                             'echo "Pack web modules into docker and push to ECR"',
                             'echo "ECR login now"',
-                            '$(aws ecr get-login --no-include-email)',
+                            '$(aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ACCOUNTID.dkr.ecr.us-west-2.amazonaws.com)',
                             'pwd',
                             'echo "build orders-web docker image"',
                             'cd orders-web',
                             'mvn package -Dmaven.test.skip=true',
                             `docker build -f src/main/docker/Dockerfile.jvm -t ${this.ecrRepository.repositoryUri}:$LATEST .`,
-                            `docker images`,
                             `docker tag ${this.ecrRepository.repositoryUri}:$LATEST ${this.ecrRepository.repositoryUri}:$TAG`,
-                            'echo "Pushing Orders-web"',
-                            `docker images`,
-                            `docker push ${this.ecrRepository.repositoryUri}:$TAG`,
                             `docker push ${this.ecrRepository.repositoryUri}:$LATEST`,
                             'echo "finished ECR push"',
 
