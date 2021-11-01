@@ -4,7 +4,7 @@ Resources:
   AcceptOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Runtime: java11
+      Runtime: java8
       Handler: solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler::handleRequest
       # Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       FunctionName: coffee-sls-OrderCreatedHandler
