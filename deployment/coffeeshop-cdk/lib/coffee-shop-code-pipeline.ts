@@ -153,7 +153,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
         });
 
         const containerDefinition = taskDefinition.addContainer('defaultContainer', {
-            image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+            image: ecs.ContainerImage.fromRegistry('coffeeshop/orders-web'),
             logging: new ecs.AwsLogDriver({
                 streamPrefix: 'coffeeshop',
             })
