@@ -72,19 +72,20 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             repo: 'designing-cloud-native-microservices-on-aws',
             webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
             webhookFilters: [
-                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),
+                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('main'),
             ], // optional, by default all pushes and Pull Requests will trigger a build
         });
-        let bucketName = 'coffeeshop';
-        let coffeeShopBucket = s3.Bucket.fromBucketName(this, 'CoffeeShopBucket', 'coffeeshop');
-        if (coffeeShopBucket == null) {
-            coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
-                bucketName: bucketName,
-                removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
-            });
-        }
+        //let bucketName = 'coffeeshop';
+        //let coffeeShopBucket = s3.Bucket.fromBucketName(this, 'CoffeeShopBucket', 'coffeeshop');
 
-        //let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
+        //if (coffeeShopBucket == null) {
+        let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
+        let coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
+            bucketName: bucketName,
+            removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
+        });
+        //}
+
 
         coffeeShopBucket.grantPut(buildRole);
         coffeeShopBucket.grantRead(buildRole);
