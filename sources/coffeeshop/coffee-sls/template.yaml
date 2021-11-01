@@ -28,4 +28,4 @@ Outputs:
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/order"
   AcceptOrderFunction:
     Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt AcceptOrder.Arn
+    Value: !GetAtt AcceptOrderFunction.Arn
