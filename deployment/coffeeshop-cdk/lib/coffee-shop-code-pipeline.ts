@@ -122,7 +122,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
                             'LATEST="latest"',
                             'echo "Pack web modules into docker and push to ECR"',
                             'echo "ECR login now"',
-                            '$(aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ACCOUNTID.dkr.ecr.us-west-2.amazonaws.com)',
+                            'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $ACCOUNTID.dkr.ecr.us-west-2.amazonaws.com',
                             'pwd',
                             'echo "build orders-web docker image"',
                             'cd orders-web',
