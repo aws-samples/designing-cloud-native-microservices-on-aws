@@ -137,26 +137,13 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
                     }
                 },
 
-
-                // cache:{
-                //     paths:[
-                //         '/root/.m2/**/*',
-                //     ]
-                // }
             })
         });
-
-        // const vpc = Vpc.fromLookup(this, 'CoffeeShopCdkStack/CoffeeShopVPC',{
-        //     vpcName: 'CoffeeShopCdkStack/CoffeeShopVPC',
-        //     isDefault: false,
-        // });
 
         const cluster = new ecs.Cluster(this, 'Cluster', {
             clusterName: 'coffeeshop',
             vpc
         });
-
-
 
         const taskDefinition = new ecs.TaskDefinition(this, 'orders-web-Task', {
             compatibility: ecs.Compatibility.FARGATE,
