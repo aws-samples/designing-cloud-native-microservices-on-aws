@@ -270,6 +270,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
 
         const sourceActionCodeCommit = new codepipeline_actions.CodeCommitSourceAction({
             actionName: 'CodeCommit',
+            branch: 'main',
             // repository: codecommit.Repository.fromRepositoryName(this, 'GitRepo', CODECOMMIT_REPO_NAME),
             repository: codecommitRepo,
             output: sourceOutputCodeCommit,
