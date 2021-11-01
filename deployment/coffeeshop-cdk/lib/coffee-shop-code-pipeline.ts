@@ -64,7 +64,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
 
         // ECR LifeCycles
         // repository.addLifecycleRule({ tagPrefixList: ['prod'], maxImageCount: 9999 });
-        this.ecrRepository.addLifecycleRule({maxImageAge: cdk.Duration.days(30)});
+        this.ecrRepository.addLifecycleRule({maxImageAge: cdk.Duration.days(40)});
 
         const defaultSource = codebuild.Source.gitHub({
             owner: 'aws-samples',
@@ -75,10 +75,11 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             ], // optional, by default all pushes and Pull Requests will trigger a build
         });
 
-        let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
+        //let bucketName = 'coffeeshop-' + Math.random().toString(36).substring(7);
+        let bucketName = 'coffeeshop';
         const coffeeShopBucket = new s3.Bucket(this, 'CoffeeShopBucket', {
             bucketName: bucketName,
-            //removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
+            removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
         });
 
         coffeeShopBucket.grantPut(buildRole);
@@ -97,6 +98,10 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
             },
             buildSpec: codebuild.BuildSpec.fromObject({
                 version: 0.2,
+                cache:{
+                    paths:
+                        - '/root/.m2/**/*'
+                },
                 phases: {
                     install:{
                         'runtime-versions': {
@@ -153,7 +158,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
         });
 
         const containerDefinition = taskDefinition.addContainer('defaultContainer', {
-            image: ecs.ContainerImage.fromRegistry('coffeeshop/orders-web'),
+            image: ecs.ContainerImage.fromRegistry('584518143473.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest'),
             logging: new ecs.AwsLogDriver({
                 streamPrefix: 'coffeeshop',
             })
