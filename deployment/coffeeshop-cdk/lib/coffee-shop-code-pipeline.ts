@@ -186,7 +186,7 @@ export class CoffeeShopCodePipeline extends cdk.Stack {
         })
 
         const fargateTaskRole = fargatesvc.service.taskDefinition.taskRole;
-        fargateTaskRole.addToPolicy(new iam.PolicyStatement({
+        fargateTaskRole.addToPrincipalPolicy(new iam.PolicyStatement({
             resources: ['*'],
             actions: ['events:*']
         }));
