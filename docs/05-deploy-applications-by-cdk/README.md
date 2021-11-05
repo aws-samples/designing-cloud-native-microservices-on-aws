@@ -6,9 +6,7 @@
 
 
 
-
-
-![](../img/EventStormingWorkshop-CDK.jpg)
+![](../img/EventStormingWorkshop-CDK.png)
 
 To deploy applications to AWS, you need to have the following essential tools installed:
 
@@ -29,15 +27,15 @@ Besides, please also update the repo owner information in theis source code:
 
 
 
->  Replace the owner to your github account.
+>  Clone this repo under your account, and replace below owner name as your github account name.
 
 ```typescript
 const defaultSource = codebuild.Source.gitHub({
-            owner: 'humank',
+            owner: '<YOUR GITHUB ACCOUNT>',
             repo: 'designing-cloud-native-microservices-on-aws',
             webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
             webhookFilters: [
-                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('master'),
+                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('main'),
             ], // optional, by default all pushes and Pull Requests will trigger a build
         });
 ```
@@ -147,7 +145,7 @@ Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/co
 [
   {
     "name": "defaultContainer",
-    "imageUri": "your ecr repository arn for this coffeeshop/solid-humank-coffeeshop/orders-web:latest"
+    "imageUri": "your ecr repository arn for this coffeeshop/coffeeshop/orders-web:latest"
   }
 ]
 ```
@@ -187,7 +185,7 @@ The **Orders-web** service endpoint is the Stack output - **CoffeeShopCodePipeli
 curl --header "Content-Type: application/json" \                                                                                            
         --request POST \
         --data '{"items":[{"productId":"5678","qty":2,"price":200}]}' \
-        http://Coffe-AlbSv-6K6V97WJT6AV-1556524944.us-west-2.elb.amazonaws.com/order
+        <<**CoffeeShopCodePipeline.AlbSvcServiceURLxxxx**>>/order
 
 Result : 
 {"items":[{"productId":"5678","qty":2,"price":200,"fee":400}],"status":0,"id":"ord-20191126-5906","createdDate":1574801783.400000000,"modifiedDate":null}
