@@ -18,16 +18,16 @@ public class OrderPolicy {
     public static void Verify(Order order) throws AggregateException {
 
         List<Exception> exceptions = new ArrayList<>();
-        if (new OrderIdSpec((OrderId) order.getId()).isSatisfy() == false)
+        if (!new OrderIdSpec((OrderId) order.getId()).isSatisfy())
             exceptions.add(new OrderIdIsNullException(Order.class.getName(), OrderErrorCode.ORDER_ID_IS_NULL, "Order Id can not be null"));
 
-        if (new OrderTableNoSpec(order.getTableNo()).isSatisfy() == false)
+        if (!new OrderTableNoSpec(order.getTableNo()).isSatisfy())
             exceptions.add(new TableNoEmptyException(Order.class.getName(), OrderErrorCode.TABLE_NO_IS_EMPTY, "Table no can not be empty"));
 
-        if (new OrderItemSpec(order.getOrderItems()).isSatisfy() == false)
+        if (!new OrderItemSpec(order.getOrderItems()).isSatisfy())
             exceptions.add(new OrderItemEmptyException(Order.class.getName(), OrderErrorCode.ORDER_ITEMS_ARE_EMPTY_OR_NULL, "OrderItem can not be empty or null"));
 
-        if (exceptions.size() > 0)
+        if (!exceptions.isEmpty())
             throw new AggregateException(exceptions);
     }
 }

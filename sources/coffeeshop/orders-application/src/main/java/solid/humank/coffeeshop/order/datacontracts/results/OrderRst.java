@@ -36,8 +36,7 @@ public class OrderRst {
         items = new ArrayList<>();
         this.id = order.getId().toString();
         this.status = order.getStatus().getValue();
-        order.getOrderItems().stream().forEach(orderItem -> {
-            orderItem.toString();
+        order.getOrderItems().forEach(orderItem -> {
             items.add(new OrderItemRst(orderItem));
         });
         this.createdDate = order.getCreatedDate();

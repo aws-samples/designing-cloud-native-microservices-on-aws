@@ -14,6 +14,6 @@ public interface IOrderRepository {
 
     Order getBy(OrderId id);
 
-    Order save(Order order);
+    void save(Order order);
 }
 

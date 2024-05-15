@@ -15,6 +15,6 @@ public class IdTranslator implements ITranslator<OrderId, String> {
 
         sb.insert(4, "/");
         sb.insert(7, "/");
-        return new OrderId(Long.valueOf(idString[2]), OffsetDateTime.parse(idString[1]));
+        return new OrderId(Long.parseLong(idString[2]), OffsetDateTime.parse(idString[1]));
     }
 }

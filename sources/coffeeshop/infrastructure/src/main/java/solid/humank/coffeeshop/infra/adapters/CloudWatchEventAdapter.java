@@ -31,7 +31,7 @@ public class CloudWatchEventAdapter {
         DomainModelMapper mapper = new DomainModelMapper();
         eventJson = mapper.writeToJsonString(occurredEvent);
 
-        logger.info("eventJson : " + eventJson);
+        logger.info("eventJson : {}", eventJson);
 
         if (eventJson == null) {
             return new PublishResult("Malformed format of Event");
@@ -41,31 +41,32 @@ public class CloudWatchEventAdapter {
 
     private PublishResult putEvent(String eventContent) {
         //add a comment for test AWS codeGuru
-        CloudWatchEventsClient cwe = CloudWatchEventsClient.builder().httpClientBuilder(UrlConnectionHttpClient.builder())
-                .build();
+        try (CloudWatchEventsClient cwe = CloudWatchEventsClient.builder().httpClientBuilder(UrlConnectionHttpClient.builder())
+                .build()) {
 
-        try {
-            Properties cweProp = getCWEParameters();
-            PutEventsRequestEntry request_entry = PutEventsRequestEntry.builder()
+            try {
+                Properties cweProp = getCWEParameters();
+                PutEventsRequestEntry request_entry = PutEventsRequestEntry.builder()
 
-                    .detail(eventContent)
-                    .detailType("customevent")
-                    .resources(SSMUtil.getParameter(cweProp.getProperty("ORDER_CREATED_RESOURCE_ARN")))
-                    .source(SSMUtil.getParameter(cweProp.getProperty("ORDER_CREATED_EVENT_SOURCE")))
-                    .build();
+                        .detail(eventContent)
+                        .detailType("customevent")
+                        .resources(SSMUtil.getParameter(cweProp.getProperty("ORDER_CREATED_RESOURCE_ARN")))
+                        .source(SSMUtil.getParameter(cweProp.getProperty("ORDER_CREATED_EVENT_SOURCE")))
+                        .build();
 
-            PutEventsRequest request = PutEventsRequest.builder()
-                    .entries(request_entry).build();
+                PutEventsRequest request = PutEventsRequest.builder()
+                        .entries(request_entry).build();
 
-            PutEventsResponse response = cwe.putEvents(request);
+                PutEventsResponse response = cwe.putEvents(request);
 
-            logger.info(response.toString());
+                logger.info(response.toString());
 
-            return new PublishResult(response.toString());
+                return new PublishResult(response.toString());
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
 
+            }
         }
         return new PublishResult("AWS Cloud Watch Events configuration is not correct. The event is not published:" + eventContent);
     }

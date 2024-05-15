@@ -17,6 +17,7 @@ import solid.humank.ddd.commons.interfaces.ITranslator;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.List;
@@ -27,9 +28,9 @@ public class CreateOrderSvc implements Serializable {
 
     //TODO 確認實作結果
 
-    @Inject
+    @Inject @Dependent
     public IOrderRepository repository;
-    @Inject
+    @Inject @Dependent
     public ITranslator<List<OrderItem>, List<OrderItemRst>> translator;
     @Inject
     DomainEventPublisher domainEventPublisher;

@@ -25,7 +25,7 @@ public class OrderDDBMapper extends AggregateRootMapper {
 
         String orderItemsJson = mapper.writeToJsonString(order.getOrderItems());
 
-        logger.info("orderItemsJson is:" + orderItemsJson);
+        logger.info("orderItemsJson is:{}", orderItemsJson);
         HashMap<String, AttributeValue> item_values = new HashMap();
 
         item_values.put("seqNo", AttributeValue.builder().n(String.valueOf(order.getId().getSeqNo())).build());

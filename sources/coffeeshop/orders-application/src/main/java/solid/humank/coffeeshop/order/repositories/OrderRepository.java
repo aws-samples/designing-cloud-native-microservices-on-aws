@@ -1,7 +1,6 @@
 package solid.humank.coffeeshop.order.repositories;
 
 import solid.humank.coffeeshop.infra.repositories.DDBRepositoryBase;
-import solid.humank.coffeeshop.infra.repositories.orders.OrderRepoSpec;
 import solid.humank.coffeeshop.order.interfaces.IOrderRepository;
 import solid.humank.coffeeshop.order.models.Order;
 import solid.humank.coffeeshop.order.models.OrderId;
@@ -22,10 +21,9 @@ public class OrderRepository implements IOrderRepository {
 //    @Inject
 //    public IRepository<Order, OrderId> repository;
 
-    public Order save(Order order) {
+    public void save(Order order) {
 
         this.repository.create(order);
-        return order;
     }
 
     @Override

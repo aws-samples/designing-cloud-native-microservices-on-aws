@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Named("test")
@@ -43,7 +44,7 @@ public class OrderCreatedHandler implements RequestStreamHandler {
         logger.info(orderCreated.getAccount());
         logger.info(orderCreated.getTime());
         logger.info(orderCreated.getRegion());
-        logger.info(orderCreated.getResources().toString());
+        logger.info(Arrays.toString(orderCreated.getResources()));
         logger.info(orderCreated.getDetail().getTableNo());
         logger.info(orderCreated.getDetail().getEventId());
         logger.info(String.valueOf(orderCreated.getDetail().getOrderItems().size()));

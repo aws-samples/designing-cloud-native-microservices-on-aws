@@ -158,7 +158,7 @@ public class Order extends AggregateRoot<OrderId> {
         if (this.status == targetStatus) return;
 
         Specification specification = new StatusTransitionSpec(this.status, previousStatus, targetStatus);
-        if (specification.isSatisfy() == false) {
+        if (!specification.isSatisfy()) {
             String errorMessage = String.format("Cant not transit order status from %s to %s", status, targetStatus);
             throw new StatusTransitionException(errorMessage);
         }
