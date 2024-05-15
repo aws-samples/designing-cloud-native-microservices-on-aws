@@ -45,11 +45,10 @@ public class OrderDDBMapper extends AggregateRootMapper {
 
 
     public ScanRequest buildCountScanRequest() {
-        ScanRequest scanRequest = ScanRequest.builder()
+
+        return ScanRequest.builder()
                 .tableName(TABLE_NAME)
                 .select(Select.COUNT)
                 .build();
-
-        return scanRequest;
     }
 }
