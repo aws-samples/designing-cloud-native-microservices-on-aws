@@ -62,124 +62,138 @@ To deploy applications to AWS EKS, you need the following essential tools instal
 
 
 
-## 🛠️ Deployment Instructions
+## 🛠️ Deployment Options
 
-### **Step 1: Clone and Prepare the Repository**
+### **Option 1: Complete Infrastructure Deployment with CDK v2 (Recommended)**
+
+This approach uses the modern `coffeeshop-cdk-v2` stack to deploy the complete infrastructure including EKS, Lambda, DynamoDB, and EventBridge.
+
+#### **Step 1: Deploy Infrastructure Stacks**
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-account/designing-cloud-native-microservices-on-aws.git
-cd designing-cloud-native-microservices-on-aws
-
-# Navigate to source code
-cd sources/coffeeshop
-
-# Verify Java version
-java -version  # Should show Java 21
-
-# Build all applications
-./gradlew clean build
-```
-
-### **Step 2: Create Amazon EKS Cluster**
-
-#### **Option A: Using eksctl (Recommended)**
-```bash
-# Create EKS cluster with Graviton3 ARM64 nodes
-eksctl create cluster \
-  --name coffeeshop-eks \
-  --region us-west-2 \
-  --nodegroup-name coffeeshop-graviton3-nodes \
-  --node-type c7g.medium \
-  --nodes 2 \
-  --nodes-min 1 \
-  --nodes-max 10 \
-  --node-ami-family AmazonLinux2 \
-  --node-ami-type AL2_ARM_64 \
-  --managed
-
-# Update kubeconfig
-aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
-
-# Verify cluster access
-kubectl get nodes
-```
-
-#### **Option B: Using AWS CDK (Advanced)**
-```bash
-# Navigate to CDK deployment
-cd ../../deployment/coffeeshop-cdk-v2
+# Navigate to CDK v2 deployment
+cd deployment/coffeeshop-cdk-v2
 
 # Install dependencies
 npm install
 
-# Deploy EKS infrastructure
+# Set your AWS account ID
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+# Bootstrap CDK (if not done before)
 cdk bootstrap aws://${AWS_ACCOUNT_ID}/us-west-2
-cdk deploy CoffeeShopEKSStack
+
+# Deploy network layer
+cdk deploy CoffeeShop-dev-Network
+
+# Deploy database layer
+cdk deploy CoffeeShop-dev-Database
+
+# Deploy Lambda functions
+cdk deploy CoffeeShop-dev-Lambda
+
+# Deploy EKS cluster
+cdk deploy CoffeeShop-dev-EKS
+
+# Deploy CI/CD pipeline
+cdk deploy CoffeeShop-dev-Pipeline
+
+# Deploy monitoring components
+cdk deploy CoffeeShop-dev-Monitoring
 ```
 
-### **Step 3: Set Up Container Registry**
+#### **Step 2: Configure kubectl and Deploy Applications**
 
 ```bash
-# Create ECR repositories for each microservice
-aws ecr create-repository --repository-name coffeeshop/orders-web --region us-west-2
-aws ecr create-repository --repository-name coffeeshop/coffee-web --region us-west-2
-aws ecr create-repository --repository-name coffeeshop/inventory-web --region us-west-2
+# Configure kubectl
+aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
 
-# Get ECR login credentials
+# Verify cluster access
+kubectl get nodes
+
+# Check if ECR repositories were created
+aws ecr describe-repositories --region us-west-2 | grep coffeeshop
+
+# The CDK stack creates:
+# - coffeeshop/orders-web
+# - coffeeshop/coffee-web  
+# - coffeeshop/inventory-web
+```
+
+#### **Step 3: Build and Deploy Applications**
+
+The CDK v2 stack includes an automated CI/CD pipeline. You can either:
+
+##### **Option A: Use the Automated Pipeline**
+```bash
+# The pipeline automatically builds and deploys when you push to the repository
+# Check pipeline status
+aws codepipeline get-pipeline-state --name CoffeeShop-dev-Pipeline
+```
+
+##### **Option B: Manual Build and Deploy**
+```bash
+# Navigate to source code
+cd ../../sources/coffeeshop
+
+# Build applications
+mvn clean package -DskipTests
+
+# Get ECR login
 aws ecr get-login-password --region us-west-2 | \
   docker login --username AWS --password-stdin \
   ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com
-```
 
-### **Step 4: Build and Push Multi-Architecture Container Images**
-
-#### **Build Orders Service**
-```bash
-cd sources/coffeeshop/orders-web
-
-# Build application JAR
-../gradlew build
-
-# Build ARM64 Docker image for Graviton3
-docker build --platform linux/arm64 -t coffeeshop/orders-web:arm64 .
-
-# Tag for ECR
-docker tag coffeeshop/orders-web:arm64 \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
-
-# Push to ECR
+# Build and push orders-web
+cd orders-web
+docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest .
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
-
 cd ..
-```
 
-#### **Build Coffee Service**
-```bash
+# Build and push coffee-web  
 cd coffee-web
-
-# Build and push coffee service
-../gradlew build
-docker build --platform linux/arm64 -t coffeeshop/coffee-web:arm64 .
-docker tag coffeeshop/coffee-web:arm64 \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
+docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest .
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
+cd ..
 
+# Build and push inventory-web
+cd inventory-web
+docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest .
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
 cd ..
 ```
 
-#### **Build Inventory Service**
+### **Option 2: Manual EKS Setup (Advanced Users)**
+
+If you prefer to set up EKS manually without CDK:
+
+#### **Step 1: Create EKS Cluster**
 ```bash
-cd inventory-web
+# Create EKS cluster with eksctl
+eksctl create cluster \
+  --name coffeeshop-eks \
+  --region us-west-2 \
+  --nodegroup-name coffeeshop-nodes \
+  --node-type t3.medium \
+  --nodes 2 \
+  --nodes-min 1 \
+  --nodes-max 10 \
+  --managed
 
-# Build and push inventory service
-../gradlew build
-docker build --platform linux/arm64 -t coffeeshop/inventory-web:arm64 .
-docker tag coffeeshop/inventory-web:arm64 \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
+# Update kubeconfig
+aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
+```
 
-cd ..
+#### **Step 2: Install Required Add-ons**
+```bash
+# Install AWS Load Balancer Controller
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+
+# Install Cluster Autoscaler
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+
+# Install Metrics Server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
 
