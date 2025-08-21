@@ -228,10 +228,7 @@ Event Storming isn't limited to just for the software development team. In fact,
 
 ## Event Storming Terms
 
-![Event Storming](https://storage.googleapis.com/xebia-blog/1/2018/10/From-EventStorming-to-CoDDDing-New-frame-3.jpg)
-
-> Reference from Kenny Bass - https://storage.googleapis.com/xebia-blog/1/2018/10/From-EventStorming-to-CoDDDing-New-frame-3.jpg
-
+![Event Storming Legends](docs/img/event-storming-legends.png)
 Take a look on this diagram, there are a few colored sticky notes with different intention:
 
 * **Domain Events** (Orange sticky note) - Describes *what happened*. Represent facts that happened in a specific business context, written in past tense
