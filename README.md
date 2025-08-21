@@ -13,7 +13,37 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
 
 **Go through all of the learning journey, develop-->build-->deploy artifacts on AWS**
 
-![](docs/img/Coffeeshop-architecture.png)
+## 🏗️ Modern Cloud-Native Architecture
+
+![CoffeeShop EKS Architecture](docs/img/Coffeeshop-architecture.png)
+
+*Modern cloud-native microservices architecture using Amazon EKS with ARM64 Graviton3 instances, EventBridge for event-driven communication, and DynamoDB for data persistence*
+
+### 🎯 **Architecture Highlights**
+
+#### **Container Orchestration (Amazon EKS)**
+- **Kubernetes Cluster**: Managed EKS with ARM64 Graviton3 nodes for cost optimization
+- **Microservices**: Orders, Coffee, and Inventory services running as containers
+- **Auto-scaling**: Horizontal Pod Autoscaler (HPA) for dynamic scaling
+- **Load Balancing**: Application Load Balancer (ALB) for traffic distribution
+
+#### **Event-Driven Architecture**
+- **Amazon EventBridge**: Central event bus for asynchronous service communication
+- **Domain Events**: OrderCreated, CoffeeRequested, InventoryUpdated events
+- **Loose Coupling**: Services communicate via events, not direct API calls
+- **Event Sourcing**: Complete audit trail of all business events
+
+#### **Modern Technology Stack**
+- **Runtime**: Java 21 LTS with enhanced performance features
+- **Framework**: Spring Boot 3.4.1 with cloud-native optimizations
+- **Architecture**: Hexagonal Architecture with Domain-Driven Design (DDD)
+- **Data Storage**: Amazon DynamoDB with pay-per-request billing
+
+#### **Cloud-Native Benefits**
+- **Scalability**: Independent scaling of each microservice
+- **Resilience**: Fault isolation and automatic recovery
+- **Cost Optimization**: ARM64 Graviton3 instances reduce compute costs by up to 20%
+- **Developer Experience**: Modern Java features and Spring Boot productivity
 
 
 
