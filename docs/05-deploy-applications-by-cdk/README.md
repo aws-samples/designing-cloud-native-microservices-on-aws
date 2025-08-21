@@ -347,32 +347,31 @@ Visit Cloudwatch Service web page, search log groups : ***/aws/lambda/coffee-sls
 
 ```shell script
 START RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc Version: $LATEST
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:39 - 0
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:40 - 7ebdf9f0-888d-540e-038d-bd6e25bea29f
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:41 - null
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:42 - solid.humank.coffeeshop.order
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:43 - 584518143473
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:44 - 2019-11-27T05:58:18Z
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:45 - us-west-2
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:46 - [Ljava.lang.String;@7ca48474
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:47 - 0
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:48 - bd56e57b-1575-49b0-b002-a8ef33c926a2
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:49 - 1
-2019-11-27 05:58:23 [main] INFO  solid.humank.coffeeshop.cofee.sls.orders.OrderCreatedHandler:50 - EntityId(abbr=ord, seqNo=5907, occurredDate=2019-11-27T05:58:14.881Z)
-2019-11-27 05:58:24 [main] DEBUG software.amazon.awssdk.request:84 - Sending Request: DefaultSdkHttpFullRequest(httpMethod=POST, protocol=https, host=dynamodb.us-west-2.amazonaws.com, encodedPath=/, headers=[amz-sdk-invocation-id, Content-Length, Content-Type, User-Agent, X-Amz-Target], queryParameters=[])
-2019-11-27 05:58:27 [main] DEBUG software.amazon.awssdk.request:84 - Received successful response: 200
-2019-11-27 05:58:27 [main] DEBUG software.amazon.awssdk.request:84 - Sending Request: DefaultSdkHttpFullRequest(httpMethod=POST, protocol=https, host=dynamodb.us-west-2.amazonaws.com, encodedPath=/, headers=[amz-sdk-invocation-id, Content-Length, Content-Type, User-Agent, X-Amz-Target], queryParameters=[])
-2019-11-27 05:58:27 [main] DEBUG software.amazon.awssdk.request:84 - Received successful response: 200
-Coffee made...
-END RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc
-REPORT RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc	Duration: 8150.39 ms	Billed Duration: 8200 ms	Memory Size: 512 MB	Max Memory Used: 156 MB	Init Duration: 887.71 ms
-```
+## 🎯 Next Steps
 
-**Check the coffee table in DynamoDB**
+### **Production Considerations**
+- **Security**: Implement Pod Security Standards and Network Policies
+- **Scaling**: Configure Horizontal Pod Autoscaler (HPA) and Vertical Pod Autoscaler (VPA)
+- **GitOps**: Set up ArgoCD or Flux for continuous deployment
+- **Service Mesh**: Consider Istio or AWS App Mesh for advanced traffic management
+- **Backup**: Implement Velero for cluster backup and disaster recovery
 
-![](../img/coffee-table-items.png)
+### **Advanced Features**
+- **Blue/Green Deployments**: Use Argo Rollouts for advanced deployment strategies
+- **Canary Releases**: Implement gradual rollouts with traffic splitting
+- **Multi-Region**: Deploy across multiple AWS regions for high availability
+- **Cost Optimization**: Use Spot instances and cluster autoscaling
 
+---
 
+**Congratulations! 🎉** You have successfully deployed the CoffeeShop microservices on Amazon EKS with a modern cloud-native architecture. The application is now running with:
 
-Now, you have gone through all of the whole coffee ordering process journey, in case you would like to hands-on more, just implement more business scenario as you can, and taste all these **Cloud coffeeshop on AWS.**
+- ☸️ **Kubernetes orchestration** for container management
+- 🚀 **Auto-scaling** for handling variable loads
+- 📊 **Comprehensive monitoring** with CloudWatch
+- 🔄 **Event-driven architecture** with EventBridge
+- 💾 **Serverless database** with DynamoDB
+- 🛡️ **Security best practices** with IAM roles and VPC isolation
+
+Your cloud-native journey continues! 🌟
 
