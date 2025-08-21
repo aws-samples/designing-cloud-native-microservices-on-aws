@@ -1,0 +1,101 @@
+@startuml CoffeeShop-EKS-Architecture
+!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v18.0/dist
+!includeurl AWSPUML/AWSCommon.puml
+!includeurl AWSPUML/Compute/all.puml
+!includeurl AWSPUML/Database/all.puml
+!includeurl AWSPUML/NetworkingContentDelivery/all.puml
+!includeurl AWSPUML/ApplicationIntegration/all.puml
+!includeurl AWSPUML/ManagementGovernance/all.puml
+
+title CoffeeShop Microservices Architecture on Amazon EKS
+skinparam backgroundColor #FAFAFA
+skinparam packageStyle rectangle
+
+actor "Users" as users
+actor "Developers" as devs
+
+package "Amazon VPC" {
+    package "Public Subnet" {
+        ApplicationLoadBalancer(alb, "Application Load Balancer", "")
+        NATGateway(nat, "NAT Gateway", "")
+    }
+    
+    package "Private Subnet" {
+        package "Amazon EKS Cluster" {
+            package "coffeeshop namespace" {
+                ElasticKubernetesService(orders, "Orders Web", "Spring Boot 3.4.1\nJava 21")
+                ElasticKubernetesService(coffee, "Coffee Web", "Spring Boot 3.4.1\nJava 21")
+                ElasticKubernetesService(inventory, "Inventory Web", "Spring Boot 3.4.1\nJava 21")
+            }
+            
+            package "System Components" {
+                ElasticKubernetesService(alb_controller, "ALB Controller", "")
+                ElasticKubernetesService(autoscaler, "Cluster Autoscaler", "")
+                ElasticKubernetesService(metrics, "Metrics Server", "")
+            }
+        }
+        
+        package "AWS Lambda" {
+            Lambda(coffee_handler, "Coffee Order Handler", "Java 21")
+            Lambda(inventory_handler, "Inventory Handler", "Java 21")
+        }
+    }
+}
+
+package "Data Layer" {
+    DynamoDB(order_db, "Order Table", "")
+    DynamoDB(coffee_db, "Coffee Table", "")
+    DynamoDB(inventory_db, "Inventory Table", "")
+}
+
+package "Event-Driven Architecture" {
+    EventBridge(eventbridge, "EventBridge", "Event Bus")
+}
+
+package "Container Registry" {
+    ElasticContainerRegistry(ecr, "Amazon ECR", "Multi-arch Images")
+}
+
+package "Monitoring" {
+    CloudWatch(cloudwatch, "CloudWatch", "Metrics & Logs")
+    SimpleNotificationService(sns, "SNS", "Alerts")
+}
+
+' User connections
+users --> alb
+devs --> ecr
+
+' ALB to services
+alb --> orders
+alb --> coffee
+alb --> inventory
+
+' Services to data
+orders --> order_db
+coffee --> coffee_db
+inventory --> inventory_db
+
+' Event-driven connections
+orders --> eventbridge : "Publish Events"
+eventbridge --> coffee_handler : "Process Events"
+eventbridge --> inventory_handler : "Process Events"
+
+' Lambda to data
+coffee_handler --> order_db
+coffee_handler --> coffee_db
+inventory_handler --> coffee_db
+
+' ECR to services
+ecr --> orders
+ecr --> coffee
+ecr --> inventory
+
+' Monitoring
+orders --> cloudwatch
+coffee --> cloudwatch
+inventory --> cloudwatch
+coffee_handler --> cloudwatch
+inventory_handler --> cloudwatch
+cloudwatch --> sns
+
+@enduml
