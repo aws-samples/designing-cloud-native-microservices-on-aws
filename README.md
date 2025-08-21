@@ -205,7 +205,12 @@ graph TB
   - [Generate unit test code skeleton](docs/04-modeling-and-development/README.md#generate-unit-test-code-skeleton)
   - [Implement Domain Model from code Skeleton](docs/04-modeling-and-development/README.md#implement-domain-model-from-code-skeleton)
   - [Design each Microservices in Port-adapter concept](docs/04-modeling-and-development/README.md#design-each-microservices-in-port-adapter-concept)
-- [05 - Deploy Applications by AWS CDK](docs/05-deploy-applications-by-cdk/README.md) 
+- [05 - Deploy Applications on Amazon EKS](docs/05-deploy-applications-by-cdk/README.md)
+  - [EKS Cluster Setup](docs/05-deploy-applications-by-cdk/README.md#step-2-create-amazon-eks-cluster)
+  - [Container Image Building](docs/05-deploy-applications-by-cdk/README.md#step-4-build-and-push-multi-architecture-container-images)
+  - [Kubernetes Deployment](docs/05-deploy-applications-by-cdk/README.md#step-6-deploy-applications-to-kubernetes)
+  - [Service Testing](docs/05-deploy-applications-by-cdk/README.md#step-7-verify-deployment)
+ 
 <!---
 - [05 - Domain Driven Design Tactical design pattern guidance](05-ddd-tactical-design-pattern)
 - [06 - Actual Implementation](06-actual-implementation)
