@@ -1,355 +1,680 @@
-[< back to 04 Modeling and Development >](../04-modeling-and-development/README.md)
+# Deploy CoffeeShop Application on Amazon EKS with CDK v2
 
-# Deploy CoffeeShop Application on Amazon EKS with Kubernetes
+[< back to 04 Modeling and Development >](../04-modeling-and-development/README.md)
 
 **Congratulations on your persistent learning journey! It's time to deploy the applications to a real AWS environment using modern cloud-native technologies.**
 
-![CoffeeShop EKS Deployment Architecture](../img/coffeeshop-eks-deployment.png)
+This section covers deploying the CoffeeShop microservices to Amazon EKS (Elastic Kubernetes Service) using the CDK v2 infrastructure-as-code approach with Quarkus-based microservices.
 
-*The above diagram illustrates the complete EKS deployment architecture, showing the development workflow from source code to production deployment, including the hybrid EKS + Lambda approach for optimal performance and cost efficiency.*
-
-This section covers deploying the CoffeeShop microservices to Amazon EKS (Elastic Kubernetes Service) using containerized deployment with ARM64 Graviton3 instances for optimal performance and cost efficiency.
-
-## 📋 Architecture Flow Overview
-
-### **Development to Deployment Pipeline**
-1. **Developer** writes Java 21 + Spring Boot 3.4.1 code
-2. **Build Process** compiles and creates ARM64 Docker images
-3. **Amazon ECR** stores multi-architecture container images
-4. **EKS Deployment** pulls images and runs microservices
-
-### **Runtime Architecture**
-- **Public Subnet**: ALB for external traffic, NAT Gateway for outbound connectivity
-- **Private Subnet**: EKS cluster with Graviton3 nodes running microservices
-- **Hybrid Computing**: EKS for core services + Lambda for event processing
-- **Data Layer**: DynamoDB tables with EventBridge for event-driven communication
-
-## 🚀 Current Deployment Architecture
+## 📋 Architecture Overview
 
 ### **Modern Cloud-Native Stack**
+
 - **Container Orchestration**: Amazon EKS (Kubernetes 1.28)
-- **Compute**: ARM64 Graviton3 instances (c7g.medium/large)
-- **Application Runtime**: Java 21 + Spring Boot 3.4.1
+- **Compute**: EC2 instances (t3.medium) with managed node groups
+- **Application Runtime**: Java 17 + Quarkus Framework
 - **Database**: Amazon DynamoDB (NoSQL)
 - **Event Messaging**: Amazon EventBridge
 - **Container Registry**: Amazon ECR
 - **Load Balancing**: Application Load Balancer (ALB)
+- **CI/CD**: AWS CodePipeline + CodeBuild
 
-### **Why EKS over ECS?**
-- **Kubernetes-Native**: Industry standard container orchestration
-- **Multi-Cloud Portability**: Kubernetes runs anywhere
-- **Rich Ecosystem**: Extensive tooling and community support
-- **Advanced Scaling**: Horizontal Pod Autoscaler (HPA) and Cluster Autoscaler
-- **Service Mesh Ready**: Native support for Istio, Linkerd
-- **GitOps Integration**: ArgoCD, Flux for continuous deployment
+### **Microservices Architecture**
 
-## 📋 Prerequisites
+The CoffeeShop application consists of three main microservices:
 
-To deploy applications to AWS EKS, you need the following essential tools installed:
+1. **Orders Web Service** (`orders-web`): Handles order management and processing
+2. **Coffee Web Service** (`coffee-web`): Manages coffee inventory and recipes
+3. **Inventory Web Service** (`inventory-web`): Tracks ingredient inventory
 
-### **Local Development Tools**
-* [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - AWS command line interface
-* [kubectl](https://kubernetes.io/docs/tasks/tools/) - Kubernetes command line tool
-* [eksctl](https://eksctl.io/installation/) - EKS cluster management tool
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Container runtime
-* [Java 21 JDK](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) - Amazon Corretto recommended
-* [Gradle 8.13+](https://gradle.org/install/) - Build automation tool
+Each service is built with:
+- **Quarkus Framework**: Cloud-native Java framework optimized for containers
+- **RESTful APIs**: JAX-RS for HTTP endpoints
+- **DynamoDB Integration**: AWS SDK for data persistence
+- **Health Checks**: Built-in health endpoints for Kubernetes probes
 
-### **AWS Account Requirements**
-* AWS Account with administrative permissions
-* AWS CLI configured with appropriate credentials
-* Sufficient service limits for EKS, EC2, and DynamoDB
+## 🛠️ Prerequisites
 
+Before deploying the applications, ensure you have the following tools installed:
 
-
-## 🛠️ Deployment Options
-
-### **Option 1: Complete Infrastructure Deployment with CDK v2 (Recommended)**
-
-This approach uses the modern `coffeeshop-cdk-v2` stack to deploy the complete infrastructure including EKS, Lambda, DynamoDB, and EventBridge.
-
-#### **Step 1: Deploy Infrastructure Stacks**
+### **Required Tools**
 
 ```bash
-# Navigate to CDK v2 deployment
-cd deployment/coffeeshop-cdk-v2
+# AWS CLI v2
+aws --version
+# aws-cli/2.x.x Python/3.x.x
 
-# Install dependencies
-npm install
+# Node.js and npm (for CDK)
+node --version  # v18.x or later
+npm --version   # v8.x or later
 
-# Set your AWS account ID
+# AWS CDK v2
+npm install -g aws-cdk
+cdk --version   # 2.x.x
+
+# Docker (for building container images)
+docker --version  # 20.x or later
+
+# kubectl (for Kubernetes management)
+kubectl version --client  # v1.28.x
+
+# Maven (for building Java applications)
+mvn --version  # 3.8.x or later
+
+# Java 17 (required for Quarkus)
+java -version  # openjdk 17.x.x
+```
+
+### **AWS Account Setup**
+
+```bash
+# Configure AWS credentials
+aws configure
+# AWS Access Key ID: [Your Access Key]
+# AWS Secret Access Key: [Your Secret Key]
+# Default region name: us-west-2
+# Default output format: json
+
+# Verify AWS account access
+aws sts get-caller-identity
+
+# Set environment variables
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export AWS_REGION=us-west-2
+echo "Account ID: $AWS_ACCOUNT_ID"
+echo "Region: $AWS_REGION"
+```
+
+## 🚀 Deployment Instructions
+
+### **Step 1: Clone and Prepare the Repository**
+
+```bash
+# Clone the repository
+git clone https://github.com/aws-samples/designing-cloud-native-microservices-on-aws.git
+cd designing-cloud-native-microservices-on-aws
+
+# Navigate to source code
+cd sources/coffeeshop
+
+# Verify Java version (must be Java 17)
+java -version
+
+# Build all applications
+mvn clean package -DskipTests
+```
+
+### **Step 2: Deploy Infrastructure with CDK v2**
+
+The CDK v2 deployment creates a complete infrastructure stack including:
+- VPC with public/private subnets
+- EKS cluster with managed node groups
+- DynamoDB tables for data storage
+- ECR repositories for container images
+- Lambda functions for event processing
+- CI/CD pipeline for automated deployments
+
+```bash
+# Navigate to CDK deployment directory
+cd ../../deployment/coffeeshop-cdk-v2
+
+# Install CDK dependencies
+npm install
 
 # Bootstrap CDK (if not done before)
 cdk bootstrap aws://${AWS_ACCOUNT_ID}/us-west-2
 
-# Deploy network layer
-cdk deploy CoffeeShop-dev-Network
+# Deploy infrastructure stacks in order
+echo "Deploying Network Stack..."
+cdk deploy CoffeeShop-dev-Network --require-approval never
 
-# Deploy database layer
-cdk deploy CoffeeShop-dev-Database
+echo "Deploying Database Stack..."
+cdk deploy CoffeeShop-dev-Database --require-approval never
 
-# Deploy Lambda functions
-cdk deploy CoffeeShop-dev-Lambda
+echo "Deploying Lambda Stack..."
+cdk deploy CoffeeShop-dev-Lambda --require-approval never
 
-# Deploy EKS cluster
-cdk deploy CoffeeShop-dev-EKS
+echo "Deploying EKS Stack..."
+cdk deploy CoffeeShop-dev-EKS --require-approval never
 
-# Deploy CI/CD pipeline
-cdk deploy CoffeeShop-dev-Pipeline
+echo "Deploying Pipeline Stack..."
+cdk deploy CoffeeShop-dev-Pipeline --require-approval never
 
-# Deploy monitoring components
-cdk deploy CoffeeShop-dev-Monitoring
+echo "Deploying Monitoring Stack..."
+cdk deploy CoffeeShop-dev-Monitoring --require-approval never
 ```
 
-#### **Step 2: Configure kubectl and Deploy Applications**
+### **Step 3: Configure kubectl for EKS**
 
 ```bash
-# Configure kubectl
+# Update kubeconfig for the EKS cluster
 aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
 
 # Verify cluster access
 kubectl get nodes
+kubectl get namespaces
 
-# Check if ECR repositories were created
-aws ecr describe-repositories --region us-west-2 | grep coffeeshop
-
-# The CDK stack creates:
-# - coffeeshop/orders-web
-# - coffeeshop/coffee-web  
-# - coffeeshop/inventory-web
+# Check cluster info
+kubectl cluster-info
 ```
 
-#### **Step 3: Build and Deploy Applications**
+### **Step 4: Build and Push Container Images**
 
-The CDK v2 stack includes an automated CI/CD pipeline. You can either:
+The CDK stack creates ECR repositories for each microservice. Now we need to build and push the container images.
 
-##### **Option A: Use the Automated Pipeline**
+#### **Build Orders Web Service**
+
 ```bash
-# The pipeline automatically builds and deploys when you push to the repository
-# Check pipeline status
-aws codepipeline get-pipeline-state --name CoffeeShop-dev-Pipeline
-```
+# Navigate to orders-web directory
+cd ../../sources/coffeeshop/orders-web
 
-##### **Option B: Manual Build and Deploy**
-```bash
-# Navigate to source code
-cd ../../sources/coffeeshop
-
-# Build applications
+# Build the application
 mvn clean package -DskipTests
 
-# Get ECR login
+# Get ECR login credentials
 aws ecr get-login-password --region us-west-2 | \
   docker login --username AWS --password-stdin \
   ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com
 
-# Build and push orders-web
-cd orders-web
-docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest .
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
-cd ..
+# Build Docker image using Quarkus JVM Dockerfile
+docker build -f src/main/docker/Dockerfile.jvm \
+  -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest .
 
-# Build and push coffee-web  
+# Push to ECR
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
+
+cd ..
+```
+
+#### **Build Coffee Web Service**
+
+```bash
+# Navigate to coffee-web directory
 cd coffee-web
+
+# Build the application
+mvn clean package -DskipTests
+
+# Build Docker image (create Dockerfile if not exists)
+cat > Dockerfile << 'EOF'
+FROM fabric8/java-alpine-openjdk17-jre
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV AB_ENABLED=jmx_exporter
+COPY target/lib/* /deployments/lib/
+COPY target/*-runner.jar /deployments/app.jar
+EXPOSE 8080
+
+RUN adduser -G root --no-create-home --disabled-password 1001 \
+  && chown -R 1001 /deployments \
+  && chmod -R "g+rwX" /deployments \
+  && chown -R 1001:root /deployments
+USER 1001
+
+ENTRYPOINT [ "/deployments/run-java.sh" ]
+EOF
+
+# Build and push Docker image
 docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest .
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
-cd ..
 
-# Build and push inventory-web
+cd ..
+```
+
+#### **Build Inventory Web Service**
+
+```bash
+# Navigate to inventory-web directory
 cd inventory-web
+
+# Build the application
+mvn clean package -DskipTests
+
+# Build Docker image (create Dockerfile if not exists)
+cat > Dockerfile << 'EOF'
+FROM fabric8/java-alpine-openjdk17-jre
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV AB_ENABLED=jmx_exporter
+COPY target/lib/* /deployments/lib/
+COPY target/*-runner.jar /deployments/app.jar
+EXPOSE 8080
+
+RUN adduser -G root --no-create-home --disabled-password 1001 \
+  && chown -R 1001 /deployments \
+  && chmod -R "g+rwX" /deployments \
+  && chown -R 1001:root /deployments
+USER 1001
+
+ENTRYPOINT [ "/deployments/run-java.sh" ]
+EOF
+
+# Build and push Docker image
 docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest .
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
+
 cd ..
 ```
 
-### **Option 2: Manual EKS Setup (Advanced Users)**
+### **Step 5: Deploy Applications to Kubernetes**
 
-If you prefer to set up EKS manually without CDK:
+Create Kubernetes manifests for the microservices:
 
-#### **Step 1: Create EKS Cluster**
+#### **Create Namespace**
+
 ```bash
-# Create EKS cluster with eksctl
-eksctl create cluster \
-  --name coffeeshop-eks \
-  --region us-west-2 \
-  --nodegroup-name coffeeshop-nodes \
-  --node-type t3.medium \
-  --nodes 2 \
-  --nodes-min 1 \
-  --nodes-max 10 \
-  --managed
-
-# Update kubeconfig
-aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
+# Create coffeeshop namespace
+kubectl create namespace coffeeshop
+kubectl config set-context --current --namespace=coffeeshop
 ```
 
-#### **Step 2: Install Required Add-ons**
+#### **Deploy Orders Web Service**
+
+```yaml
+# Create orders-web-deployment.yaml
+cat > orders-web-deployment.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-web
+  namespace: coffeeshop
+  labels:
+    app: orders-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orders-web
+  template:
+    metadata:
+      labels:
+        app: orders-web
+    spec:
+      containers:
+      - name: orders-web
+        image: ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: QUARKUS_HTTP_HOST
+          value: "0.0.0.0"
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+        - name: AWS_REGION
+          value: "us-west-2"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-web-service
+  namespace: coffeeshop
+spec:
+  selector:
+    app: orders-web
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
+EOF
+
+# Replace AWS_ACCOUNT_ID in the manifest
+sed -i "s/\${AWS_ACCOUNT_ID}/${AWS_ACCOUNT_ID}/g" orders-web-deployment.yaml
+
+# Deploy orders service
+kubectl apply -f orders-web-deployment.yaml
+```
+
+#### **Deploy Coffee Web Service**
+
+```yaml
+# Create coffee-web-deployment.yaml
+cat > coffee-web-deployment.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coffee-web
+  namespace: coffeeshop
+  labels:
+    app: coffee-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coffee-web
+  template:
+    metadata:
+      labels:
+        app: coffee-web
+    spec:
+      containers:
+      - name: coffee-web
+        image: ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: QUARKUS_HTTP_HOST
+          value: "0.0.0.0"
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+        - name: AWS_REGION
+          value: "us-west-2"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coffee-web-service
+  namespace: coffeeshop
+spec:
+  selector:
+    app: coffee-web
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
+EOF
+
+# Replace AWS_ACCOUNT_ID in the manifest
+sed -i "s/\${AWS_ACCOUNT_ID}/${AWS_ACCOUNT_ID}/g" coffee-web-deployment.yaml
+
+# Deploy coffee service
+kubectl apply -f coffee-web-deployment.yaml
+```
+
+#### **Deploy Inventory Web Service**
+
+```yaml
+# Create inventory-web-deployment.yaml
+cat > inventory-web-deployment.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-web
+  namespace: coffeeshop
+  labels:
+    app: inventory-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory-web
+  template:
+    metadata:
+      labels:
+        app: inventory-web
+    spec:
+      containers:
+      - name: inventory-web
+        image: ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: QUARKUS_HTTP_HOST
+          value: "0.0.0.0"
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+        - name: AWS_REGION
+          value: "us-west-2"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-web-service
+  namespace: coffeeshop
+spec:
+  selector:
+    app: inventory-web
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
+EOF
+
+# Replace AWS_ACCOUNT_ID in the manifest
+sed -i "s/\${AWS_ACCOUNT_ID}/${AWS_ACCOUNT_ID}/g" inventory-web-deployment.yaml
+
+# Deploy inventory service
+kubectl apply -f inventory-web-deployment.yaml
+```
+
+#### **Create Application Load Balancer Ingress**
+
+```yaml
+# Create ingress.yaml
+cat > ingress.yaml << 'EOF'
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: coffeeshop-ingress
+  namespace: coffeeshop
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /orders
+        pathType: Prefix
+        backend:
+          service:
+            name: orders-web-service
+            port:
+              number: 80
+      - path: /coffee
+        pathType: Prefix
+        backend:
+          service:
+            name: coffee-web-service
+            port:
+              number: 80
+      - path: /inventory
+        pathType: Prefix
+        backend:
+          service:
+            name: inventory-web-service
+            port:
+              number: 80
+EOF
+
+# Deploy ingress
+kubectl apply -f ingress.yaml
+```
+
+#### **Wait for Deployments to Complete**
+
 ```bash
-# Install AWS Load Balancer Controller
-kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+# Wait for all deployments to be ready
+kubectl rollout status deployment/orders-web -n coffeeshop
+kubectl rollout status deployment/coffee-web -n coffeeshop
+kubectl rollout status deployment/inventory-web -n coffeeshop
 
-# Install Cluster Autoscaler
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+# Check pod status
+kubectl get pods -n coffeeshop
 
-# Install Metrics Server
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+# Check services
+kubectl get services -n coffeeshop
+
+# Check ingress (may take a few minutes to provision ALB)
+kubectl get ingress -n coffeeshop
 ```
 
+## 🔍 Step 6: Verify Deployment
 
+### **Check Application Status**
 
-> Create build project
+```bash
+# Check all resources in coffeeshop namespace
+kubectl get all -n coffeeshop
 
-![](../img/setup-webhook.png)
+# Check pod logs
+kubectl logs -f deployment/orders-web -n coffeeshop
+kubectl logs -f deployment/coffee-web -n coffeeshop
+kubectl logs -f deployment/inventory-web -n coffeeshop
 
-
-
-> Specify source, select github, and then **Click Connect to Github**
-
-![](../img/specify-source.png)
-
-
-
-> Authorize AWS CodeBuild, click **Authorize aws-codesuite** and confirm **Password**
-
-![](../img/authorize.png)
-
-
-
-> Get connected with Github
-
-![](../img/get-connected.png)
-
-
-
-**Now, your github account is get connected with aws-codesuite, you don't need to save this code project, just cancel it. These steps just for webhook authorization.**
-
------
-
-### Deploy infrastructure and Application with Code* family CI/CD pipeline by CDK
-
-**By running this CDK application, You will get a standard VPC with 3 Availablity Zones environment, and one NATGateway serving private subnets.**
-
-**Besides, in order to have an ease of use container orcheration service, an ECS Cluster with Fargate mode is also created.**
-
-### Deploy Application by Code* family
-
-```shell script
-cd deployment/coffeeshop-cdk
-
-npm install
-
-npm run build 
-
-cdk synth
-
-cdk bootstrap aws://${your-aws-id}/${your-region-todeploy}
-
-cdk deploy CoffeeShopCodePipeline 
+# Get ALB URL (wait for ADDRESS to be populated)
+kubectl get ingress coffeeshop-ingress -n coffeeshop -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 ```
 
-**This workshop sample code is developed in Java8 with Quarkus Framework, Libs dependency managed by Maven. By running this CDK CoffeeShopCodePipeline stack, You will have:**
+### **Test API Endpoints**
 
-* ECR - Will create a Docker Image repository to serve Orders-Web application.
-* CodeCommit Repository - for auto deployment
-* CodeBuild - Get Github WebHooked project, build source code, build docker image, Push image to ECR,  deploy **Orders-web** Fargate Service, deploy **coffee-sls Lambda Function**, create **Dynamodb Table -{ Order, Coffee}**, create Event Rule in default **Amazon EventBridge** ..etc.
+```bash
+# Get the ALB URL
+ALB_URL=$(kubectl get ingress coffeeshop-ingress -n coffeeshop -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+echo "ALB URL: http://${ALB_URL}"
 
+# Test orders service health check
+curl -v http://${ALB_URL}/orders/
 
+# Test coffee service health check
+curl -v http://${ALB_URL}/coffee/
 
-**Deploy Result**
+# Test inventory service health check
+curl -v http://${ALB_URL}/inventory/
 
-```shell
-Outputs:
-CoffeeShopCodePipeline.CodeBuildProjectName = CodeBuildProject
-CoffeeShopCodePipeline.AlbSvcServiceURL46A1D997 = http://Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
-CoffeeShopCodePipeline.AlbSvcLoadBalancerDNS20AA0F0B = Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
-CoffeeShopCodePipeline.Hint =
-Create a "imagedefinitions.json" file and git add/push into CodeCommit repository "designing-cloud-native-microservices-on-aws
-" with the following value:
-
-[
-  {
-    "name": "defaultContainer",
-    "imageUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest"
-  }
-]
-
-CoffeeShopCodePipeline.Bucket = coffeeshop-nypea
-CoffeeShopCodePipeline.CodeCommitRepoName = designing-cloud-native-microservices-on-aws
-CoffeeShopCodePipeline.ServiceURL = http://Coffe-AlbSv-5MLHALGIGWUB-82783022.us-west-2.elb.amazonaws.com
-CoffeeShopCodePipeline.StackName = CoffeeShopCodePipeline
-CoffeeShopCodePipeline.StackId = arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShopCodePipeline/f10c0520-0618-11ea-8122-023709c486f0
-
-Stack ARN:
-arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShopCodePipeline/f10c0520-0618-11ea-8122-023709c486f0
+# Expected response: {"status":"healthy"}
 ```
 
-Do remember to create a ["imagedefinitions.json"](https://docs.aws.amazon.com/codepipeline/latest/userguide/file-reference.html#pipelines-create-image-definitions) file and git add/push into CodeCommit repository "designing-cloud-native-microservices-on-aws
-" (that has been created as part of the deployment above) with the following value:
+### **Monitor Application Logs**
 
-```
-[
-  {
-    "name": "defaultContainer",
-    "imageUri": "your ecr repository arn for this coffeeshop/coffeeshop/orders-web:latest"
-  }
-]
-```
+```bash
+# View real-time logs for all services
+kubectl logs -f deployment/orders-web -n coffeeshop &
+kubectl logs -f deployment/coffee-web -n coffeeshop &
+kubectl logs -f deployment/inventory-web -n coffeeshop &
 
-
-### Way to Deploy applications 
-
-You could deploy these applications via two approach: 
-
-1. At first time, self manually deploy application in CodeBuild service, just to select the CodeBuild project and click the **start build** button, then the deployment process will be started.
-2. Anytime, if you make any chang on the designing-cloud-native-microservices-on-aws repository on github, while you commit and push  to  master branch, then the CodeBuild service will automatically build it and trigger the codepipeline to deploy all these applications.
-
-### Setup Lambda function trigger with EventBridge
-
-```shell
-targetArn=$(aws lambda get-function --function-name coffee-sls-OrderCreatedHandler | jq '.Configuration.FunctionArn')
-
-aws events  put-targets --rule OrderCreatedRule --targets "Id"="OrderCreated","Arn"=$targetArn
-
-ruleArn=$(aws events list-rules --name-prefix OrderCreatedRule | jq -r '.Rules[0].Arn')
-
-aws lambda add-permission \
-	--function-name coffee-sls-OrderCreatedHandler \
-  --action lambda:InvokeFunction \
-	--statement-id stat-coffee-sls \
-  --principal events.amazonaws.com \
-	--source-arn $ruleArn
+# Stop log monitoring
+# Press Ctrl+C to stop
 ```
 
-### Run Test
+## 📊 Monitoring and Observability
 
-**As all of the setting done, now you could hit the url which you created to make an coffee order:**
+### **CloudWatch Integration**
 
-The **Orders-web** service endpoint is the Stack output - **CoffeeShopCodePipeline.AlbSvcServiceURLxxxx**
+The CDK stack automatically configures:
+- **Container Insights**: EKS cluster and pod metrics
+- **Application Logs**: Centralized logging to CloudWatch
+- **Custom Metrics**: Application metrics from Quarkus
+- **Alarms**: Automated alerting for critical issues
 
-```shell
-curl --header "Content-Type: application/json" \                                                                                            
-        --request POST \
-        --data '{"items":[{"productId":"5678","qty":2,"price":200}]}' \
-        <<**CoffeeShopCodePipeline.AlbSvcServiceURLxxxx**>>/order
+### **Access CloudWatch Dashboard**
 
-Result : 
-{"items":[{"productId":"5678","qty":2,"price":200,"fee":400}],"status":0,"id":"ord-20191126-5906","createdDate":1574801783.400000000,"modifiedDate":null}
+```bash
+# Get CloudWatch dashboard URL
+echo "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#dashboards:"
+
+# View EKS cluster metrics
+echo "https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#container-insights:performance/EKS:Cluster?~(query~(~'coffeeshop-eks)~context~())"
 ```
 
-**Check the order table in DynamoDB**
+### **Kubernetes Native Monitoring**
 
-![](../img/order-table-items.png)
+```bash
+# Check resource usage
+kubectl top nodes
+kubectl top pods -n coffeeshop
 
-**Check the lambda function(Order created event Handler) logs**
+# Check events
+kubectl get events -n coffeeshop --sort-by='.lastTimestamp'
 
-Visit Cloudwatch Service web page, search log groups : ***/aws/lambda/coffee-sls-OrderCreatedHandler***
+# Describe problematic pods
+kubectl describe pod <pod-name> -n coffeeshop
+```
 
-```shell script
-START RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc Version: $LATEST
+## 🧹 Cleanup Resources
+
+### **Delete Kubernetes Resources**
+
+```bash
+# Delete applications
+kubectl delete namespace coffeeshop
+
+# Verify deletion
+kubectl get namespaces
+```
+
+### **Delete CDK Stacks**
+
+```bash
+# Navigate to CDK directory
+cd deployment/coffeeshop-cdk-v2
+
+# Destroy all stacks (in reverse order)
+cdk destroy CoffeeShop-dev-Monitoring --force
+cdk destroy CoffeeShop-dev-Pipeline --force
+cdk destroy CoffeeShop-dev-EKS --force
+cdk destroy CoffeeShop-dev-Lambda --force
+cdk destroy CoffeeShop-dev-Database --force
+cdk destroy CoffeeShop-dev-Network --force
+```
+
 ## 🎯 Next Steps
 
 ### **Production Considerations**
+
 - **Security**: Implement Pod Security Standards and Network Policies
 - **Scaling**: Configure Horizontal Pod Autoscaler (HPA) and Vertical Pod Autoscaler (VPA)
 - **GitOps**: Set up ArgoCD or Flux for continuous deployment
@@ -357,6 +682,7 @@ START RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc Version: $LATEST
 - **Backup**: Implement Velero for cluster backup and disaster recovery
 
 ### **Advanced Features**
+
 - **Blue/Green Deployments**: Use Argo Rollouts for advanced deployment strategies
 - **Canary Releases**: Implement gradual rollouts with traffic splitting
 - **Multi-Region**: Deploy across multiple AWS regions for high availability
@@ -374,4 +700,3 @@ START RequestId: acfc1cf1-ba73-402e-921d-2fa2d95af5dc Version: $LATEST
 - 🛡️ **Security best practices** with IAM roles and VPC isolation
 
 Your cloud-native journey continues! 🌟
-
