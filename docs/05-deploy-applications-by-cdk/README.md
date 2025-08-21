@@ -1,54 +1,186 @@
 [< back to 04 Modeling and Development >](../04-modeling-and-development/README.md)
 
-# Deploy Coffeeshop application through AWS Code* Suite with AWS CDK
+# Deploy CoffeeShop Application on Amazon EKS with Kubernetes
 
-**Kudos for your insist learning from this repository. It's time to deploy the applications to real AWS environment.**
+**Congratulations on your persistent learning journey! It's time to deploy the applications to a real AWS environment using modern cloud-native technologies.**
+
+![CoffeeShop EKS Deployment Architecture](../img/coffeeshop-eks-deployment.png)
+
+*The above diagram illustrates the complete EKS deployment architecture, showing the development workflow from source code to production deployment, including the hybrid EKS + Lambda approach for optimal performance and cost efficiency.*
+
+This section covers deploying the CoffeeShop microservices to Amazon EKS (Elastic Kubernetes Service) using containerized deployment with ARM64 Graviton3 instances for optimal performance and cost efficiency.
+
+## 📋 Architecture Flow Overview
+
+### **Development to Deployment Pipeline**
+1. **Developer** writes Java 21 + Spring Boot 3.4.1 code
+2. **Build Process** compiles and creates ARM64 Docker images
+3. **Amazon ECR** stores multi-architecture container images
+4. **EKS Deployment** pulls images and runs microservices
+
+### **Runtime Architecture**
+- **Public Subnet**: ALB for external traffic, NAT Gateway for outbound connectivity
+- **Private Subnet**: EKS cluster with Graviton3 nodes running microservices
+- **Hybrid Computing**: EKS for core services + Lambda for event processing
+- **Data Layer**: DynamoDB tables with EventBridge for event-driven communication
+
+## 🚀 Current Deployment Architecture
+
+### **Modern Cloud-Native Stack**
+- **Container Orchestration**: Amazon EKS (Kubernetes 1.28)
+- **Compute**: ARM64 Graviton3 instances (c7g.medium/large)
+- **Application Runtime**: Java 21 + Spring Boot 3.4.1
+- **Database**: Amazon DynamoDB (NoSQL)
+- **Event Messaging**: Amazon EventBridge
+- **Container Registry**: Amazon ECR
+- **Load Balancing**: Application Load Balancer (ALB)
+
+### **Why EKS over ECS?**
+- **Kubernetes-Native**: Industry standard container orchestration
+- **Multi-Cloud Portability**: Kubernetes runs anywhere
+- **Rich Ecosystem**: Extensive tooling and community support
+- **Advanced Scaling**: Horizontal Pod Autoscaler (HPA) and Cluster Autoscaler
+- **Service Mesh Ready**: Native support for Istio, Linkerd
+- **GitOps Integration**: ArgoCD, Flux for continuous deployment
+
+## 📋 Prerequisites
+
+To deploy applications to AWS EKS, you need the following essential tools installed:
+
+### **Local Development Tools**
+* [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - AWS command line interface
+* [kubectl](https://kubernetes.io/docs/tasks/tools/) - Kubernetes command line tool
+* [eksctl](https://eksctl.io/installation/) - EKS cluster management tool
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Container runtime
+* [Java 21 JDK](https://docs.aws.amazon.com/corretto/latest/corretto-21-ug/downloads-list.html) - Amazon Corretto recommended
+* [Gradle 8.13+](https://gradle.org/install/) - Build automation tool
+
+### **AWS Account Requirements**
+* AWS Account with administrative permissions
+* AWS CLI configured with appropriate credentials
+* Sufficient service limits for EKS, EC2, and DynamoDB
 
 
 
-![](../img/EventStormingWorkshop-CDK.png)
+## 🛠️ Deployment Instructions
 
-To deploy applications to AWS, you need to have the following essential tools installed:
+### **Step 1: Clone and Prepare the Repository**
 
-* [AWS CLI](https://docs.aws.amazon.com/zh_tw/cli/latest/userguide/cli-chap-install.html)
-* [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)
+```bash
+# Clone the repository
+git clone https://github.com/your-account/designing-cloud-native-microservices-on-aws.git
+cd designing-cloud-native-microservices-on-aws
 
+# Navigate to source code
+cd sources/coffeeshop
 
+# Verify Java version
+java -version  # Should show Java 21
 
-## Deploy instruction
-
-### Fork this repo to your own github account
-
-This workshop will leverage Github webhook mechanism to automatically build / deploy application onto aws, so the first step is fork it.
-
-Besides, please also update the repo owner information in theis source code:
-
-**designing-cloud-native-microservices-on-aws/deployment/coffeeshop-cdk/lib/coffee-shop-code-pipeline.ts**
-
-
-
->  Clone this repo under your account, and replace below owner name as your github account name.
-
-```typescript
-const defaultSource = codebuild.Source.gitHub({
-            owner: '<YOUR GITHUB ACCOUNT>',
-            repo: 'designing-cloud-native-microservices-on-aws',
-            webhook: true, // optional, default: true if `webhookFilteres` were provided, false otherwise
-            webhookFilters: [
-                codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs('main'),
-            ], // optional, by default all pushes and Pull Requests will trigger a build
-        });
+# Build all applications
+./gradlew clean build
 ```
 
+### **Step 2: Create Amazon EKS Cluster**
 
+#### **Option A: Using eksctl (Recommended)**
+```bash
+# Create EKS cluster with Graviton3 ARM64 nodes
+eksctl create cluster \
+  --name coffeeshop-eks \
+  --region us-west-2 \
+  --nodegroup-name coffeeshop-graviton3-nodes \
+  --node-type c7g.medium \
+  --nodes 2 \
+  --nodes-min 1 \
+  --nodes-max 10 \
+  --node-ami-family AmazonLinux2 \
+  --node-ami-type AL2_ARM_64 \
+  --managed
 
+# Update kubeconfig
+aws eks update-kubeconfig --region us-west-2 --name coffeeshop-eks
 
+# Verify cluster access
+kubectl get nodes
+```
 
------
+#### **Option B: Using AWS CDK (Advanced)**
+```bash
+# Navigate to CDK deployment
+cd ../../deployment/coffeeshop-cdk-v2
 
-### Get Github Webhook integration
+# Install dependencies
+npm install
 
-Open the AWS Codebuild console, and click the **Create build project**, we will leverage this step to setup webhook, but we don't need to really save this build project, please follow the screenshots.
+# Deploy EKS infrastructure
+cdk bootstrap aws://${AWS_ACCOUNT_ID}/us-west-2
+cdk deploy CoffeeShopEKSStack
+```
+
+### **Step 3: Set Up Container Registry**
+
+```bash
+# Create ECR repositories for each microservice
+aws ecr create-repository --repository-name coffeeshop/orders-web --region us-west-2
+aws ecr create-repository --repository-name coffeeshop/coffee-web --region us-west-2
+aws ecr create-repository --repository-name coffeeshop/inventory-web --region us-west-2
+
+# Get ECR login credentials
+aws ecr get-login-password --region us-west-2 | \
+  docker login --username AWS --password-stdin \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com
+```
+
+### **Step 4: Build and Push Multi-Architecture Container Images**
+
+#### **Build Orders Service**
+```bash
+cd sources/coffeeshop/orders-web
+
+# Build application JAR
+../gradlew build
+
+# Build ARM64 Docker image for Graviton3
+docker build --platform linux/arm64 -t coffeeshop/orders-web:arm64 .
+
+# Tag for ECR
+docker tag coffeeshop/orders-web:arm64 \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
+
+# Push to ECR
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/orders-web:latest
+
+cd ..
+```
+
+#### **Build Coffee Service**
+```bash
+cd coffee-web
+
+# Build and push coffee service
+../gradlew build
+docker build --platform linux/arm64 -t coffeeshop/coffee-web:arm64 .
+docker tag coffeeshop/coffee-web:arm64 \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/coffee-web:latest
+
+cd ..
+```
+
+#### **Build Inventory Service**
+```bash
+cd inventory-web
+
+# Build and push inventory service
+../gradlew build
+docker build --platform linux/arm64 -t coffeeshop/inventory-web:arm64 .
+docker tag coffeeshop/inventory-web:arm64 \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/coffeeshop/inventory-web:latest
+
+cd ..
+```
 
 
 
