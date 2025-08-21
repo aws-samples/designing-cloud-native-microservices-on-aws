@@ -10,7 +10,7 @@ When capturing Events in business scenarios, be aware that domain experts may or
 - Focus on the core business value
 - Figure out trigger and result
 
-![](../img/coffee-shop-events-v2.png?)
+![](../img/coffee-shop-events-v2.png)
 
 **An example of the immutable events occurred:**
 * Menu offered
@@ -29,13 +29,13 @@ You can always arrange these events sequentially in the timeline where it occurr
 
 Now, let's add in *Commands*. Commands are triggers, actions or intention that result in the event. Label them with a blue sticky note. Use present tense for Commands.
 
-![](../img/coffee-shop-role-trigger-v2.png?)
+![](../img/coffee-shop-role-trigger-v2.png)
 
 ### Roles
 
 As you explore these events, think about the key players involved in these Events. We call them Roles. Roles can represent a human or a system. Use a yellow sticky note to represent them. You should end up with something as follow.
 
-![](../img/coffee-shop-event-trigger-v2.png?)
+![](../img/coffee-shop-event-trigger-v2.png)
 
 The roles involved would be:
 * Customer
@@ -67,7 +67,7 @@ Represent these failure scenarios with red sticky notes. For example, think abou
 * What if the customer ordered coffee without giving a table number?
 * What if the barista made a wrong order?
 
-![](../img/coffee-shop-risk-v2.png?)
+![](../img/coffee-shop-risk-v2.png)
 
 Regardless if it's a failure or mistake, the customer experience will be impacted. There is a need to re-think about these issues to sieve out further actions to prevent or solve these issues.
 
