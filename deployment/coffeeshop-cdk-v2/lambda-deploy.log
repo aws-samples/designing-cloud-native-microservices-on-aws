@@ -1,0 +1,50 @@
+Including dependency stacks: CoffeeShop-dev-Database, CoffeeShop-dev-Network
+
+✨  Synthesis time: 7.2s
+
+CoffeeShop-dev-Network
+CoffeeShop-dev-Network: deploying... [1/3]
+
+ ✅  CoffeeShop-dev-Network (no changes)
+
+✨  Deployment time: 2.71s
+
+Outputs:
+CoffeeShop-dev-Network.ExportsOutputRefCoffeeShopVPC7F853AEEE304C46C = vpc-0c91b6423fe4007a6
+CoffeeShop-dev-Network.ExportsOutputRefCoffeeShopVPCPrivateSubnet1Subnet4B6571FABB94DF8C = subnet-02459da3fbe480542
+CoffeeShop-dev-Network.ExportsOutputRefCoffeeShopVPCPrivateSubnet2Subnet9CA4B6730FB2B1FD = subnet-0eca15b94e4f66508
+CoffeeShop-dev-Network.ExportsOutputRefCoffeeShopVPCPublicSubnet1Subnet0AE298EB6C862A55 = subnet-0dfe42c18dba4f72e
+CoffeeShop-dev-Network.ExportsOutputRefCoffeeShopVPCPublicSubnet2SubnetA2BB6851FDC2AE98 = subnet-07cb837ca6cde5a41
+CoffeeShop-dev-Network.SecurityGroupId = sg-0a5f07b1f2bfc33d3
+CoffeeShop-dev-Network.VpcId = vpc-0c91b6423fe4007a6
+Stack ARN:
+arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShop-dev-Network/05611660-77ff-11f0-9786-06f6573154d1
+
+✨  Total time: 9.91s
+
+CoffeeShop-dev-Database
+CoffeeShop-dev-Database: deploying... [2/3]
+
+ ✅  CoffeeShop-dev-Database (no changes)
+
+✨  Deployment time: 1.2s
+
+Outputs:
+CoffeeShop-dev-Database.CoffeeTableName = Coffee
+CoffeeShop-dev-Database.InventoryTableName = Inventory
+CoffeeShop-dev-Database.OrderTableName = Order
+Stack ARN:
+arn:aws:cloudformation:us-west-2:584518143473:stack/CoffeeShop-dev-Database/9294a180-7801-11f0-983e-0a8f53f2063f
+
+✨  Total time: 8.4s
+
+CoffeeShop-dev-Lambda
+CoffeeShop-dev-Lambda: deploying... [3/3]
+CoffeeShop-dev-Lambda: creating CloudFormation changeset...
+CoffeeShop-dev-Lambda |  0/29 | 3:40:29 PM | UPDATE_IN_PROGRESS   | AWS::CloudFormation::Stack  | CoffeeShop-dev-Lambda User Initiated
+CoffeeShop-dev-Lambda |  0/29 | 3:40:32 PM | UPDATE_ROLLBACK_IN_P | AWS::CloudFormation::Stack  | CoffeeShop-dev-Lambda Delete canceled. Cannot delete export CoffeeShop-dev-Lambda:ExportsOutputRefOrderProcessor53D1FCB88A1E0FB7 as it is in use by CoffeeShop-dev-Monitoring.
+CoffeeShop-dev-Lambda |  1/29 | 3:40:37 PM | UPDATE_ROLLBACK_COMP | AWS::CloudFormation::Stack  | CoffeeShop-dev-Lambda 
+CoffeeShop-dev-Lambda |  2/29 | 3:40:38 PM | UPDATE_ROLLBACK_COMP | AWS::CloudFormation::Stack  | CoffeeShop-dev-Lambda 
+
+Failed resources:
+❌  CoffeeShop-dev-Lambda failed: ToolkitError: The stack named CoffeeShop-dev-Lambda failed to deploy: UPDATE_ROLLBACK_COMPLETE
