@@ -15,6 +15,13 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
 
 ## 🏗️ Modern Cloud-Native Architecture on Amazon EKS
 
+![CoffeeShop EKS Architecture](docs/img/coffeeshop-eks-architecture.png)
+
+*AWS cloud-native microservices architecture using EKS + Lambda hybrid computing model with event-driven service communication via EventBridge*
+
+<details>
+<summary>📋 Click to view Mermaid source code</summary>
+
 ```mermaid
 graph TB
     %% External Users and Systems
@@ -22,7 +29,7 @@ graph TB
     Developer[👨‍💻 Developers] --> ECR[Amazon ECR<br/>Container Registry]
     
     %% Network Layer
-    subgraph VPC["🌐 Amazon VPC"]
+    subgraph VPC["🌐 Amazon VPC (10.0.0.0/16)"]
         subgraph PublicSubnet["Public Subnet"]
             ALB
             NAT[NAT Gateway]
@@ -41,6 +48,7 @@ graph TB
                     ALBController[AWS Load Balancer Controller]
                     ClusterAutoscaler[Cluster Autoscaler]
                     MetricsServer[Metrics Server]
+                    EBSCSIDriver[EBS CSI Driver]
                 end
             end
             
@@ -62,6 +70,11 @@ graph TB
     %% Event-Driven Architecture
     subgraph EventDriven["📡 Event-Driven Architecture"]
         EventBridge[Amazon EventBridge<br/>Event Bus]
+    end
+    
+    %% API Gateway
+    subgraph APILayer["🌐 API Layer"]
+        APIGateway[Amazon API Gateway<br/>REST API]
     end
     
     %% Monitoring and Observability
@@ -88,13 +101,14 @@ graph TB
     InventoryPod --> DynamoInventory
     
     %% Lambda connections
-    EventBridge --> CoffeeOrderHandler
-    EventBridge --> InventoryHandler
+    APIGateway --> CoffeeOrderHandler
+    APIGateway --> InventoryHandler
     CoffeeOrderHandler --> DynamoOrder
     CoffeeOrderHandler --> DynamoCoffee
     InventoryHandler --> DynamoCoffee
     
     %% Event-driven flow
+    EventBridge --> CoffeeOrderHandler
     OrdersPod -.->|Send Events| EventBridge
     
     %% ECR to EKS
@@ -130,13 +144,13 @@ graph TB
     classDef monitoring fill:#f44336,stroke:#b71c1c,stroke-width:2px,color:#fff
     
     class User,Developer userClass
-    class ALB,ECR,EKS,Lambda,EventBridge,CloudWatch,SNS,Pipeline awsService
+    class ALB,ECR,EKS,Lambda,EventBridge,APIGateway,CloudWatch,SNS,Pipeline awsService
     class OrdersPod,CoffeePod,InventoryPod,CoffeeOrderHandler,InventoryHandler microservice
     class DynamoOrder,DynamoCoffee,DynamoInventory database
     class Dashboard,SNS monitoring
 ```
 
-*AWS cloud-native microservices architecture using EKS + Lambda hybrid computing model with event-driven service communication via EventBridge*
+</details>
 
 ### 🎯 **Architecture Highlights**
 

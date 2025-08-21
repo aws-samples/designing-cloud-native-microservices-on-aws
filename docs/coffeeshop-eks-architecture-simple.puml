@@ -1,0 +1,112 @@
+@startuml CoffeeShop-EKS-Architecture
+
+title CoffeeShop Microservices Architecture on Amazon EKS
+skinparam backgroundColor #FAFAFA
+skinparam packageStyle rectangle
+
+actor "👤 Users" as users
+actor "👨‍💻 Developers" as devs
+
+package "🌐 Amazon VPC" {
+    package "Public Subnet" {
+        rectangle "Application Load Balancer" as alb #FF9800
+        rectangle "NAT Gateway" as nat #FF9800
+    }
+    
+    package "Private Subnet" {
+        package "☸️ Amazon EKS Cluster" {
+            package "coffeeshop namespace" {
+                rectangle "📦 Orders Web\nSpring Boot 3.4.1\nJava 21" as orders #4CAF50
+                rectangle "☕ Coffee Web\nSpring Boot 3.4.1\nJava 21" as coffee #4CAF50
+                rectangle "📋 Inventory Web\nSpring Boot 3.4.1\nJava 21" as inventory #4CAF50
+            }
+            
+            package "System Components" {
+                rectangle "AWS Load Balancer\nController" as alb_controller #FF9800
+                rectangle "Cluster Autoscaler" as autoscaler #FF9800
+                rectangle "Metrics Server" as metrics #FF9800
+            }
+        }
+        
+        package "🔧 AWS Lambda" {
+            rectangle "Coffee Order Handler\nJava 21" as coffee_handler #4CAF50
+            rectangle "Inventory Handler\nJava 21" as inventory_handler #4CAF50
+        }
+    }
+}
+
+package "💾 Data Layer" {
+    database "📊 DynamoDB\nOrder Table" as order_db #9C27B0
+    database "☕ DynamoDB\nCoffee Table" as coffee_db #9C27B0
+    database "📋 DynamoDB\nInventory Table" as inventory_db #9C27B0
+}
+
+package "📡 Event-Driven Architecture" {
+    rectangle "Amazon EventBridge\nEvent Bus" as eventbridge #FF9800
+}
+
+package "Container Registry" {
+    rectangle "Amazon ECR\nMulti-arch Images" as ecr #FF9800
+}
+
+package "📊 Monitoring" {
+    rectangle "Amazon CloudWatch\nMetrics & Logs" as cloudwatch #F44336
+    rectangle "Amazon SNS\nAlerts" as sns #F44336
+}
+
+package "🚀 CI/CD Pipeline" {
+    rectangle "EKS Pipeline Stack\nAutomated Deployment" as pipeline #FF9800
+}
+
+' User connections
+users --> alb
+devs --> ecr
+
+' ALB to services
+alb --> orders
+alb --> coffee
+alb --> inventory
+
+' Services to data
+orders --> order_db
+coffee --> coffee_db
+inventory --> inventory_db
+
+' Event-driven connections
+orders --> eventbridge : "Publish Events"
+eventbridge --> coffee_handler : "Process Events"
+eventbridge --> inventory_handler : "Process Events"
+
+' Lambda to data
+coffee_handler --> order_db
+coffee_handler --> coffee_db
+inventory_handler --> coffee_db
+
+' ECR to services
+ecr --> orders
+ecr --> coffee
+ecr --> inventory
+
+' Monitoring
+orders --> cloudwatch
+coffee --> cloudwatch
+inventory --> cloudwatch
+coffee_handler --> cloudwatch
+inventory_handler --> cloudwatch
+cloudwatch --> sns
+
+' CI/CD
+pipeline --> ecr
+pipeline --> orders
+pipeline --> coffee
+pipeline --> inventory
+
+' Auto-scaling
+metrics --> orders
+metrics --> coffee
+metrics --> inventory
+autoscaler --> orders
+autoscaler --> coffee
+autoscaler --> inventory
+
+@enduml
