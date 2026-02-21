@@ -42,7 +42,8 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
   - [Generate unit test code skeleton](docs/04-modeling-and-development/README.md#generate-unit-test-code-skeleton)
   - [Implement Domain Model from code Skeleton](docs/04-modeling-and-development/README.md#implement-domain-model-from-code-skeleton)
   - [Design each Microservices in Port-adapter concept](docs/04-modeling-and-development/README.md#design-each-microservices-in-port-adapter-concept)
-- [05 - Deploy Applications by AWS CDK](docs/05-deploy-applications-by-cdk/README.md) 
+- [05 - Deploy Applications by AWS CDK](docs/05-deploy-applications-by-cdk/README.md)
+- [Showcase Website](#showcase-website)
 <!---
 - [05 - Domain Driven Design Tactical design pattern guidance](05-ddd-tactical-design-pattern)
 - [06 - Actual Implementation](06-actual-implementation)
@@ -108,6 +109,21 @@ Event Storming can also help to identify key views for your user interface, whic
 Let's get started with a quick example to demonstrate how to run a simple Event Storming.
 
 [Next: 01 Hands-on Events Exploring >](docs/01-hands-on-events-exploring/README.md)
+
+## Showcase Website
+
+An interactive single-page showcase website is included under the `website/` directory. It demonstrates the three Bounded Contexts (Orders, Coffee, Inventory) with a live DDD architecture diagram, an order form, a coffee menu, and an inventory dashboard.
+
+**Tech stack:** HTML + Tailwind CSS CDN + Vanilla JS (no build step required)
+
+**Quick start:**
+```bash
+cd website
+python3 -m http.server 8888
+# Open http://localhost:8888
+```
+
+The website connects to the three Spring Boot microservices (ports 8081/8082/8083). When the backend is offline, it gracefully falls back to static data so the UI remains fully functional for demo purposes.
 
 
 ## License
