@@ -10,7 +10,7 @@ When capturing Events in business scenarios, be aware that domain experts may or
 - Focus on the core business value
 - Figure out trigger and result
 
-![](../img/coffee-shop-events-v2.png?)
+![](../img/coffee-shop-events-v2.png)
 
 **An example of the immutable events occurred:**
 * Menu offered
@@ -29,13 +29,13 @@ You can always arrange these events sequentially in the timeline where it occurr
 
 Now, let's add in *Commands*. Commands are triggers, actions or intention that result in the event. Label them with a blue sticky note. Use present tense for Commands.
 
-![](../img/coffee-shop-role-trigger-v2.png?)
+![](../img/coffee-shop-role-trigger-v2.png)
 
 ### Roles
 
 As you explore these events, think about the key players involved in these Events. We call them Roles. Roles can represent a human or a system. Use a yellow sticky note to represent them. You should end up with something as follow.
 
-![](../img/coffee-shop-event-trigger-v2.png?)
+![](../img/coffee-shop-event-trigger-v2.png)
 
 The roles involved would be:
 * Customer
@@ -51,9 +51,25 @@ We shall call the interface between the *Command* and *Event* as a "(?)" for now
 
 Sometimes, "(?)" could also communicate with other business capability provider, or external system with the Event as an outcome.
 
-<!--
-From technical viewpoint, we can adopt pub-sub mechanism to deal with this scenario.
--->
+### Technical Implementation
+
+From a technical viewpoint, we can adopt modern cloud-native patterns to implement this event-driven architecture:
+
+#### **Event-Driven Architecture with Amazon EventBridge**
+- **Event Publishing**: Microservices publish domain events to Amazon EventBridge
+- **Event Consumption**: Other services subscribe to relevant events for loose coupling
+- **Event Routing**: EventBridge routes events based on content and rules
+
+#### **Microservices on Amazon EKS**
+- **Container Orchestration**: Services run as containers on Kubernetes (EKS)
+- **Service Communication**: Asynchronous via EventBridge, synchronous via REST APIs
+- **Scalability**: Horizontal Pod Autoscaler (HPA) for automatic scaling
+
+#### **Modern Implementation Stack**
+- **Runtime**: Java 21 + Spring Boot 3.4.1
+- **Architecture**: Hexagonal Architecture with DDD patterns
+- **Data Storage**: Amazon DynamoDB for each bounded context
+- **Event Bus**: Amazon EventBridge for domain event propagation
 ### Exceptions or risky events
 
 Throughout the events exploration journey, there will be many different sticky notes pasted on the wall and not all events will have a smooth flow.
@@ -67,7 +83,7 @@ Represent these failure scenarios with red sticky notes. For example, think abou
 * What if the customer ordered coffee without giving a table number?
 * What if the barista made a wrong order?
 
-![](../img/coffee-shop-risk-v2.png?)
+![](../img/coffee-shop-risk-v2.png)
 
 Regardless if it's a failure or mistake, the customer experience will be impacted. There is a need to re-think about these issues to sieve out further actions to prevent or solve these issues.
 
@@ -120,6 +136,45 @@ It is sometimes worth to do a "Bounded Context Mapping" which can uncover what a
 
 > Recommend to read [Bounded Context Mapping - by Domain Driven Design Taiwan Community - Eason Kuo](https://www.slideshare.net/YiChengKuo1/implementing-domaindriven-design-study-group-chapter-3-context-maps) for more details.
 
-Next, let's look at how we can translate all these into modeling into development work.
+## 🏗️ From Domain Design to Cloud-Native Implementation
+
+Now that we've identified the domain boundaries and event flows, let's see how these concepts translate into our modern cloud-native architecture:
+
+### **Domain to Microservice Mapping**
+
+#### **Identified Bounded Contexts → EKS Microservices**
+- **Order Context** → `orders-web` service (Spring Boot on EKS)
+- **Coffee Context** → `coffee-web` service (Spring Boot on EKS)  
+- **Inventory Context** → `inventory-web` service (Spring Boot on EKS)
+
+#### **Domain Events → EventBridge Events**
+- **OrderCreated** → Published to EventBridge when order is placed
+- **CoffeeRequested** → Triggers coffee preparation workflow
+- **InventoryUpdated** → Updates stock levels across services
+
+#### **Aggregates → Microservice Boundaries**
+Each aggregate becomes a microservice with its own:
+- **Database**: DynamoDB table for data persistence
+- **API**: REST endpoints for external communication
+- **Event Handlers**: Subscribers for relevant domain events
+
+### **Cloud-Native Architecture Benefits**
+
+#### **Scalability**
+- **Horizontal Scaling**: Each microservice scales independently based on load
+- **Auto-scaling**: Kubernetes HPA adjusts replicas automatically
+- **Resource Efficiency**: ARM64 Graviton3 instances for cost optimization
+
+#### **Resilience**
+- **Fault Isolation**: Failure in one service doesn't affect others
+- **Circuit Breakers**: Prevent cascade failures between services
+- **Health Checks**: Kubernetes monitors and restarts unhealthy pods
+
+#### **Event-Driven Benefits**
+- **Loose Coupling**: Services communicate via events, not direct calls
+- **Eventual Consistency**: Each service maintains its own data consistency
+- **Audit Trail**: EventBridge provides complete event history
+
+Next, let's look at how we can translate all these domain concepts into actual code and deployment.
 
 [Next: 04 Modeling and Development >](../04-modeling-and-development/README.md)

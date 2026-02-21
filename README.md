@@ -13,7 +13,170 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
 
 **Go through all of the learning journey, develop-->build-->deploy artifacts on AWS**
 
-![](docs/img/Coffeeshop-architecture.png)
+## 🏗️ Modern Cloud-Native Architecture on Amazon EKS
+
+![CoffeeShop EKS Architecture](docs/img/coffeeshop-eks-architecture.png)
+
+*AWS cloud-native microservices architecture using EKS + Lambda hybrid computing model with event-driven service communication via EventBridge*
+
+<details>
+<summary>📋 Click to view Mermaid source code</summary>
+
+```mermaid
+graph TB
+    %% External Users and Systems
+    User[👤 Users] --> ALB[Application Load Balancer]
+    Developer[👨‍💻 Developers] --> ECR[Amazon ECR<br/>Container Registry]
+    
+    %% Network Layer
+    subgraph VPC["🌐 Amazon VPC (10.0.0.0/16)"]
+        subgraph PublicSubnet["Public Subnet"]
+            ALB
+            NAT[NAT Gateway]
+        end
+        
+        subgraph PrivateSubnet["Private Subnet"]
+            %% EKS Cluster
+            subgraph EKS["☸️ Amazon EKS Cluster"]
+                subgraph Namespace["coffeeshop namespace"]
+                    OrdersPod[📦 Orders Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                    CoffeePod[☕ Coffee Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                    InventoryPod[📋 Inventory Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                end
+                
+                subgraph SystemPods["System Components"]
+                    ALBController[AWS Load Balancer Controller]
+                    ClusterAutoscaler[Cluster Autoscaler]
+                    MetricsServer[Metrics Server]
+                    EBSCSIDriver[EBS CSI Driver]
+                end
+            end
+            
+            %% Lambda Functions
+            subgraph Lambda["🔧 AWS Lambda"]
+                CoffeeOrderHandler[Coffee Order Handler<br/>Java 21]
+                InventoryHandler[Inventory Handler<br/>Java 21]
+            end
+        end
+    end
+    
+    %% Data Layer
+    subgraph DataLayer["💾 Data Layer"]
+        DynamoOrder[(📊 DynamoDB<br/>Order Table)]
+        DynamoCoffee[(☕ DynamoDB<br/>Coffee Table)]
+        DynamoInventory[(📋 DynamoDB<br/>Inventory Table)]
+    end
+    
+    %% Event-Driven Architecture
+    subgraph EventDriven["📡 Event-Driven Architecture"]
+        EventBridge[Amazon EventBridge<br/>Event Bus]
+    end
+    
+    %% API Gateway
+    subgraph APILayer["🌐 API Layer"]
+        APIGateway[Amazon API Gateway<br/>REST API]
+    end
+    
+    %% Monitoring and Observability
+    subgraph Monitoring["📊 Monitoring & Observability"]
+        CloudWatch[Amazon CloudWatch<br/>Metrics & Logs]
+        Dashboard[CloudWatch Dashboard]
+        SNS[Amazon SNS<br/>Alarm Notifications]
+    end
+    
+    %% CI/CD Pipeline
+    subgraph CICD["🚀 CI/CD Pipeline"]
+        Pipeline[EKS Pipeline Stack<br/>Automated Deployment]
+    end
+    
+    %% Connections
+    ALB --> OrdersPod
+    ALB --> CoffeePod
+    ALB --> InventoryPod
+    
+    %% Microservices to Data
+    OrdersPod --> DynamoOrder
+    OrdersPod --> EventBridge
+    CoffeePod --> DynamoCoffee
+    InventoryPod --> DynamoInventory
+    
+    %% Lambda connections
+    APIGateway --> CoffeeOrderHandler
+    APIGateway --> InventoryHandler
+    CoffeeOrderHandler --> DynamoOrder
+    CoffeeOrderHandler --> DynamoCoffee
+    InventoryHandler --> DynamoCoffee
+    
+    %% Event-driven flow
+    EventBridge --> CoffeeOrderHandler
+    OrdersPod -.->|Send Events| EventBridge
+    
+    %% ECR to EKS
+    ECR --> OrdersPod
+    ECR --> CoffeePod
+    ECR --> InventoryPod
+    
+    %% Monitoring connections
+    OrdersPod --> CloudWatch
+    CoffeePod --> CloudWatch
+    InventoryPod --> CloudWatch
+    CoffeeOrderHandler --> CloudWatch
+    InventoryHandler --> CloudWatch
+    EKS --> CloudWatch
+    CloudWatch --> Dashboard
+    CloudWatch --> SNS
+    
+    %% CI/CD
+    Pipeline --> ECR
+    Pipeline --> EKS
+    
+    %% Auto-scaling
+    MetricsServer --> OrdersPod
+    MetricsServer --> CoffeePod
+    MetricsServer --> InventoryPod
+    ClusterAutoscaler --> EKS
+    
+    %% Styling
+    classDef userClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef awsService fill:#ff9800,stroke:#e65100,stroke-width:2px,color:#fff
+    classDef microservice fill:#4caf50,stroke:#1b5e20,stroke-width:2px,color:#fff
+    classDef database fill:#9c27b0,stroke:#4a148c,stroke-width:2px,color:#fff
+    classDef monitoring fill:#f44336,stroke:#b71c1c,stroke-width:2px,color:#fff
+    
+    class User,Developer userClass
+    class ALB,ECR,EKS,Lambda,EventBridge,APIGateway,CloudWatch,SNS,Pipeline awsService
+    class OrdersPod,CoffeePod,InventoryPod,CoffeeOrderHandler,InventoryHandler microservice
+    class DynamoOrder,DynamoCoffee,DynamoInventory database
+    class Dashboard,SNS monitoring
+```
+
+</details>
+
+### 🎯 **Architecture Highlights**
+
+#### **Container Orchestration (Amazon EKS)**
+- **Kubernetes Cluster**: Managed EKS with ARM64 Graviton3 nodes for cost optimization
+- **Microservices**: Orders, Coffee, and Inventory services running as containers
+- **Auto-scaling**: Horizontal Pod Autoscaler (HPA) for dynamic scaling
+- **Load Balancing**: Application Load Balancer (ALB) for traffic distribution
+
+#### **Event-Driven Architecture**
+- **Amazon EventBridge**: Central event bus for asynchronous service communication
+- **Domain Events**: OrderCreated, CoffeeRequested, InventoryUpdated events
+- **Loose Coupling**: Services communicate via events, not direct API calls
+- **Event Sourcing**: Complete audit trail of all business events
+
+#### **Modern Technology Stack**
+- **Runtime**: Java 21 LTS with enhanced performance features
+- **Framework**: Spring Boot 3.4.1 with cloud-native optimizations
+- **Architecture**: Hexagonal Architecture with Domain-Driven Design (DDD)
+- **Data Storage**: Amazon DynamoDB with pay-per-request billing
+
+#### **Cloud-Native Benefits**
+- **Scalability**: Independent scaling of each microservice
+- **Resilience**: Fault isolation and automatic recovery
+- **Cost Optimization**: ARM64 Graviton3 instances reduce compute costs by up to 20%
+- **Developer Experience**: Modern Java features and Spring Boot productivity
 
 
 
@@ -42,7 +205,7 @@ As a developer, knowing how to narrow this gap can help you go a long way to bui
   - [Generate unit test code skeleton](docs/04-modeling-and-development/README.md#generate-unit-test-code-skeleton)
   - [Implement Domain Model from code Skeleton](docs/04-modeling-and-development/README.md#implement-domain-model-from-code-skeleton)
   - [Design each Microservices in Port-adapter concept](docs/04-modeling-and-development/README.md#design-each-microservices-in-port-adapter-concept)
-- [05 - Deploy Applications by AWS CDK](docs/05-deploy-applications-by-cdk/README.md)
+- [05 - Deploy Applications on Amazon EKS](docs/05-deploy-applications-by-cdk/README.md)
 - [Showcase Website](#showcase-website)
 <!---
 - [05 - Domain Driven Design Tactical design pattern guidance](05-ddd-tactical-design-pattern)
@@ -66,10 +229,7 @@ Event Storming isn't limited to just for the software development team. In fact,
 
 ## Event Storming Terms
 
-![Event Storming](https://storage.googleapis.com/xebia-blog/1/2018/10/From-EventStorming-to-CoDDDing-New-frame-3.jpg)
-
-> Reference from Kenny Bass - https://storage.googleapis.com/xebia-blog/1/2018/10/From-EventStorming-to-CoDDDing-New-frame-3.jpg
-
+![Event Storming Legends](docs/img/event-storming-legends.png)
 Take a look on this diagram, there are a few colored sticky notes with different intention:
 
 * **Domain Events** (Orange sticky note) - Describes *what happened*. Represent facts that happened in a specific business context, written in past tense

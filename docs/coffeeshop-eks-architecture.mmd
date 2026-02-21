@@ -1,0 +1,125 @@
+graph TB
+    %% External Users and Systems
+    User[👤 Users] --> ALB[Application Load Balancer]
+    Developer[👨‍💻 Developers] --> ECR[Amazon ECR<br/>Container Registry]
+    
+    %% Network Layer
+    subgraph VPC["🌐 Amazon VPC (10.0.0.0/16)"]
+        subgraph PublicSubnet["Public Subnet"]
+            ALB
+            NAT[NAT Gateway]
+        end
+        
+        subgraph PrivateSubnet["Private Subnet"]
+            %% EKS Cluster
+            subgraph EKS["☸️ Amazon EKS Cluster"]
+                subgraph Namespace["coffeeshop namespace"]
+                    OrdersPod[📦 Orders Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                    CoffeePod[☕ Coffee Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                    InventoryPod[📋 Inventory Web<br/>Spring Boot 3.4.1<br/>Java 21]
+                end
+                
+                subgraph SystemPods["System Components"]
+                    ALBController[AWS Load Balancer Controller]
+                    ClusterAutoscaler[Cluster Autoscaler]
+                    MetricsServer[Metrics Server]
+                    EBSCSIDriver[EBS CSI Driver]
+                end
+            end
+            
+            %% Lambda Functions
+            subgraph Lambda["🔧 AWS Lambda"]
+                CoffeeOrderHandler[Coffee Order Handler<br/>Java 21]
+                InventoryHandler[Inventory Handler<br/>Java 21]
+            end
+        end
+    end
+    
+    %% Data Layer
+    subgraph DataLayer["💾 Data Layer"]
+        DynamoOrder[(📊 DynamoDB<br/>Order Table)]
+        DynamoCoffee[(☕ DynamoDB<br/>Coffee Table)]
+        DynamoInventory[(📋 DynamoDB<br/>Inventory Table)]
+    end
+    
+    %% Event-Driven Architecture
+    subgraph EventDriven["📡 Event-Driven Architecture"]
+        EventBridge[Amazon EventBridge<br/>Event Bus]
+    end
+    
+    %% API Gateway
+    subgraph APILayer["🌐 API Layer"]
+        APIGateway[Amazon API Gateway<br/>REST API]
+    end
+    
+    %% Monitoring and Observability
+    subgraph Monitoring["📊 Monitoring & Observability"]
+        CloudWatch[Amazon CloudWatch<br/>Metrics & Logs]
+        Dashboard[CloudWatch Dashboard]
+        SNS[Amazon SNS<br/>Alarm Notifications]
+    end
+    
+    %% CI/CD Pipeline
+    subgraph CICD["🚀 CI/CD Pipeline"]
+        Pipeline[EKS Pipeline Stack<br/>Automated Deployment]
+    end
+    
+    %% Connections
+    ALB --> OrdersPod
+    ALB --> CoffeePod
+    ALB --> InventoryPod
+    
+    %% Microservices to Data
+    OrdersPod --> DynamoOrder
+    OrdersPod --> EventBridge
+    CoffeePod --> DynamoCoffee
+    InventoryPod --> DynamoInventory
+    
+    %% Lambda connections
+    APIGateway --> CoffeeOrderHandler
+    APIGateway --> InventoryHandler
+    CoffeeOrderHandler --> DynamoOrder
+    CoffeeOrderHandler --> DynamoCoffee
+    InventoryHandler --> DynamoCoffee
+    
+    %% Event-driven flow
+    EventBridge --> CoffeeOrderHandler
+    OrdersPod -.->|Send Events| EventBridge
+    
+    %% ECR to EKS
+    ECR --> OrdersPod
+    ECR --> CoffeePod
+    ECR --> InventoryPod
+    
+    %% Monitoring connections
+    OrdersPod --> CloudWatch
+    CoffeePod --> CloudWatch
+    InventoryPod --> CloudWatch
+    CoffeeOrderHandler --> CloudWatch
+    InventoryHandler --> CloudWatch
+    EKS --> CloudWatch
+    CloudWatch --> Dashboard
+    CloudWatch --> SNS
+    
+    %% CI/CD
+    Pipeline --> ECR
+    Pipeline --> EKS
+    
+    %% Auto-scaling
+    MetricsServer --> OrdersPod
+    MetricsServer --> CoffeePod
+    MetricsServer --> InventoryPod
+    ClusterAutoscaler --> EKS
+    
+    %% Styling
+    classDef userClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef awsService fill:#ff9800,stroke:#e65100,stroke-width:2px,color:#fff
+    classDef microservice fill:#4caf50,stroke:#1b5e20,stroke-width:2px,color:#fff
+    classDef database fill:#9c27b0,stroke:#4a148c,stroke-width:2px,color:#fff
+    classDef monitoring fill:#f44336,stroke:#b71c1c,stroke-width:2px,color:#fff
+    
+    class User,Developer userClass
+    class ALB,ECR,EKS,Lambda,EventBridge,APIGateway,CloudWatch,SNS,Pipeline awsService
+    class OrdersPod,CoffeePod,InventoryPod,CoffeeOrderHandler,InventoryHandler microservice
+    class DynamoOrder,DynamoCoffee,DynamoInventory database
+    class Dashboard,SNS monitoring
