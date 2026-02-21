@@ -10,8 +10,8 @@ import java.time.format.DateTimeFormatter;
 public abstract class EntityId extends ValueObject {
 
     @Getter(AccessLevel.PUBLIC)
-    @Setter(AccessLevel.PROTECTED)
-    String abbr;
+    @Setter(AccessLevel.PUBLIC)
+    protected String abbr;
 
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PRIVATE)

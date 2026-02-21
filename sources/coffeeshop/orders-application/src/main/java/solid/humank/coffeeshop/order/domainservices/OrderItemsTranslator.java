@@ -6,11 +6,11 @@ import solid.humank.coffeeshop.order.datacontracts.results.OrderItemRst;
 import solid.humank.coffeeshop.order.models.OrderItem;
 import solid.humank.ddd.commons.interfaces.ITranslator;
 
-import javax.enterprise.context.Dependent;
+import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Dependent
+@Component
 public class OrderItemsTranslator implements ITranslator<List<OrderItem>, List<OrderItemRst>> {
 
     Logger logger = LoggerFactory.getLogger(OrderItemsTranslator.class);

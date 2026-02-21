@@ -13,17 +13,19 @@ import solid.humank.coffeeshop.coffee.repositories.CoffeeRepository;
 import solid.humank.coffeeshop.inventories.applicationservices.ConfirmInventorySvc;
 import solid.humank.ddd.commons.interfaces.ITranslator;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@org.springframework.stereotype.Service
 public class MakeCoffeeSvc {
 
-    @Inject
+    @Autowired
     public ICoffeeRepository repository;
-    @Inject
+    @Autowired
     public ITranslator<List<CoffeeItem>, List<CoffeeItemRst>> translator;
-    @Inject
+    @Autowired
     ConfirmInventorySvc confirmInventorySvc;
 
     public MakeCoffeeSvc() {

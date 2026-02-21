@@ -11,10 +11,8 @@ import solid.humank.ddd.commons.baseclasses.Specification;
 import solid.humank.ddd.commons.interfaces.IRepository;
 import solid.humank.ddd.commons.interfaces.ISelector;
 
-import javax.enterprise.context.Dependent;
 import java.util.List;
 
-@Dependent
 public class DDBRepositoryBase<T extends AggregateRoot, U extends EntityId> implements IRepository<T, U> {
 
 

@@ -32,11 +32,7 @@
             <artifactId>aws-lambda-java-log4j2</artifactId>
             <version>1.2.0</version>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-amazon-lambda</artifactId>
-            <version>${quarkus.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>solid.humank</groupId>
             <artifactId>coffee-application</artifactId>

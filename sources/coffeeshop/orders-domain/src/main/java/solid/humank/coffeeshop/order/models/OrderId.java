@@ -1,5 +1,7 @@
 package solid.humank.coffeeshop.order.models;
 
+import lombok.AccessLevel;
+import lombok.Setter;
 import solid.humank.ddd.commons.baseclasses.EntityId;
 
 import java.time.OffsetDateTime;
@@ -8,12 +10,13 @@ import java.time.format.DateTimeFormatter;
 public class OrderId extends EntityId {
 
     public OrderId() {
-        this.setAbbr("ord");
+        super();
+        this.abbr = "ord";
     }
 
     public OrderId(long seqNo, OffsetDateTime createdDate) {
         super(seqNo, createdDate);
-        this.setAbbr("ord");
+        this.abbr = "ord";
     }
 
     public static OrderId fromString(String transRequest) {

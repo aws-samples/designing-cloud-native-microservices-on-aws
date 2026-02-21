@@ -13,7 +13,7 @@
 
 package solid.humank.coffeeshop.order.models;
 
-import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
-@RegisterForReflection
+@Setter
+
 public class Order extends AggregateRoot<OrderId> {
 
     final static Logger logger = LoggerFactory.getLogger(Order.class);

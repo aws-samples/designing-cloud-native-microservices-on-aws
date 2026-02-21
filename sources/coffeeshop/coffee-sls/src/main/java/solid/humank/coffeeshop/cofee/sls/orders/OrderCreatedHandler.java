@@ -13,7 +13,6 @@ import solid.humank.coffeeshop.coffee.repositories.CoffeeRepository;
 import solid.humank.coffeeshop.inventories.applicationservices.ConfirmInventorySvc;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
-import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Named("test")
 public class OrderCreatedHandler implements RequestStreamHandler {
 
 //    @Inject

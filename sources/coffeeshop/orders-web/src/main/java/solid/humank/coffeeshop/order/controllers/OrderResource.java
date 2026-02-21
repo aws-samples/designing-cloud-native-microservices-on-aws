@@ -5,32 +5,28 @@ import solid.humank.coffeeshop.order.datacontracts.messages.CreateOrderMsg;
 import solid.humank.coffeeshop.order.datacontracts.results.OrderItemRst;
 import solid.humank.coffeeshop.order.datacontracts.results.OrderRst;
 import solid.humank.coffeeshop.order.exceptions.AggregateException;
+import solid.humank.ddd.commons.interfaces.rest.CommonResponse;
 import solid.humank.coffeeshop.order.models.requests.AddOrderReq;
 import solid.humank.coffeeshop.order.models.requestsmodels.OrderItemRM;
 
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Path("/order")
+@RestController
+@RequestMapping("/order")
 public class OrderResource {
 
-    @Inject
+    @Autowired
     CreateOrderSvc service;
 
     public OrderResource() {
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrder(AddOrderReq request) {
+    @PostMapping
+    public ResponseEntity<CommonResponse> createOrder(@RequestBody AddOrderReq request) {
 
         CreateOrderMsg cmd = new CreateOrderMsg("0", this.transformToOrderItemVM(request.getItems()));
 
@@ -45,9 +41,9 @@ public class OrderResource {
         }
 
         if (err == null) {
-            return Response.ok(orderRst).status(Response.Status.CREATED).build();
+            return ResponseEntity.status(201).body(new CommonResponse(orderRst));
         }
-        return Response.ok(err).build();
+        return ResponseEntity.badRequest().body(new CommonResponse(err));
     }
 
     private List<OrderItemRst> transformToOrderItemVM(List<OrderItemRM> items) {

@@ -16,23 +16,22 @@ import solid.humank.coffeeshop.order.models.OrderStatus;
 import solid.humank.ddd.commons.interfaces.ITranslator;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.List;
 
 
-@ApplicationScoped
+@Service
 public class CreateOrderSvc implements Serializable {
 
     //TODO 確認實作結果
 
-    @Inject @Dependent
+    @Autowired
     public IOrderRepository repository;
-    @Inject @Dependent
+    @Autowired
     public ITranslator<List<OrderItem>, List<OrderItemRst>> translator;
-    @Inject
+    @Autowired
     DomainEventPublisher domainEventPublisher;
     Logger logger = LoggerFactory.getLogger(CreateOrderSvc.class);
 

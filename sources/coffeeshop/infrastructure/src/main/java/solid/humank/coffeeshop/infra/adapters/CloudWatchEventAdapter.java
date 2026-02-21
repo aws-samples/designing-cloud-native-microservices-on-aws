@@ -11,14 +11,13 @@ import software.amazon.awssdk.services.cloudwatchevents.model.PutEventsResponse;
 import solid.humank.ddd.commons.baseclasses.DomainEvent;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
-import javax.enterprise.context.RequestScoped;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
 
-@RequestScoped
 public class CloudWatchEventAdapter {
 
     Logger logger = LoggerFactory.getLogger(CloudWatchEventAdapter.class);

@@ -1,12 +1,12 @@
 package solid.humank.coffeeshop.order.models;
 
-import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import lombok.EqualsAndHashCode;
 import solid.humank.ddd.commons.baseclasses.ValueObject;
 
 import java.math.BigDecimal;
 
-@RegisterForReflection
+
 @EqualsAndHashCode(callSuper = false)
 
 public class OrderItem extends ValueObject<OrderItem> {
