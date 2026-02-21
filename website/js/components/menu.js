@@ -34,7 +34,7 @@ async function loadMenuData() {
     renderMenuCards(items);
   } catch (error) {
     hideSkeleton(skeletonId);
-    showError(containerId, error.message || '無法載入菜單，請稍後再試', loadMenuData);
+    showError(containerId, error.message || 'Failed to load menu, please try again later', loadMenuData);
   }
 }
 
@@ -56,7 +56,7 @@ function renderMenuCards(items) {
 
   if (!items || items.length === 0) {
     container.innerHTML =
-      '<p class="col-span-full text-center text-slate-400 text-sm py-12">目前沒有可用的菜單項目</p>';
+      '<p class="col-span-full text-center text-slate-400 text-sm py-12">No menu items available</p>';
     return;
   }
 
@@ -81,7 +81,7 @@ function createMenuCard(item) {
   card.setAttribute('tabindex', '0');
   card.setAttribute('role', 'button');
   card.setAttribute('aria-expanded', 'false');
-  card.setAttribute('aria-label', item.name + ' — 點擊展開詳細資訊');
+  card.setAttribute('aria-label', item.name + ' — click to expand details');
 
   // Build card inner HTML
   var sizesHtml = buildSizesHtml(item.sizes);
@@ -116,7 +116,7 @@ function createMenuCard(item) {
 
       // Expand indicator
       '<div class="flex items-center justify-center mt-3 text-slate-400 transition-all duration-200">' +
-        '<span class="text-xs mr-1">詳細資訊</span>' +
+        '<span class="text-xs mr-1">Details</span>' +
         menuChevronDownSvg() +
       '</div>' +
 
@@ -188,7 +188,7 @@ function buildRecipePreviewHtml(recipe) {
     parts.push(
       '<span class="text-slate-500">|</span>' +
       menuDropletSvg() +
-      '<span>牛奶 ' + recipe.milkMl + 'ml</span>'
+      '<span>Milk ' + recipe.milkMl + 'ml</span>'
     );
   }
 
@@ -196,7 +196,7 @@ function buildRecipePreviewHtml(recipe) {
     parts.push(
       '<span class="text-slate-500">|</span>' +
       menuGlassSvg() +
-      '<span>水 ' + recipe.waterMl + 'ml</span>'
+      '<span>Water ' + recipe.waterMl + 'ml</span>'
     );
   }
 
@@ -214,22 +214,22 @@ function buildDetailHtml(recipe, customizations) {
 
   // Recipe details
   html += '<h4 class="font-[\'JetBrains_Mono\'] text-sm font-semibold text-[#F8FAFC] mb-3 flex items-center gap-2">' +
-    menuBeakerSvg() + '配方詳情</h4>';
+    menuBeakerSvg() + 'Recipe Details</h4>';
 
   html += '<dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">';
 
   html += buildDetailRow('Espresso', recipe.espressoShots + ' shot' + (recipe.espressoShots > 1 ? 's' : ''));
 
   if (recipe.milkMl > 0) {
-    html += buildDetailRow('牛奶', recipe.milkMl + ' ml');
+    html += buildDetailRow('Milk', recipe.milkMl + ' ml');
   }
 
   if (recipe.waterMl > 0) {
-    html += buildDetailRow('水', recipe.waterMl + ' ml');
+    html += buildDetailRow('Water', recipe.waterMl + ' ml');
   }
 
   if (recipe.foam) {
-    html += buildDetailRow('奶泡', escapeHtml(recipe.foam));
+    html += buildDetailRow('Foam', escapeHtml(recipe.foam));
   }
 
   html += '</dl>';
@@ -237,7 +237,7 @@ function buildDetailHtml(recipe, customizations) {
   // Customizations
   if (customizations && customizations.length > 0) {
     html += '<h4 class="font-[\'JetBrains_Mono\'] text-sm font-semibold text-[#F8FAFC] mb-3 flex items-center gap-2">' +
-      menuSettingsSvg() + '客製化選項</h4>';
+      menuSettingsSvg() + 'Customization Options</h4>';
 
     html += '<ul class="space-y-2">';
     for (var i = 0; i < customizations.length; i++) {

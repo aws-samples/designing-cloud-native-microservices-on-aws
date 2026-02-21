@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EventStorming Coffeeshop</title>
-  <meta name="description" content="透過 Domain Driven Design 與 Event Storming 工作坊，探索雲端原生微服務架構">
+  <meta name="description" content="Explore cloud-native microservice architecture through Domain Driven Design and Event Storming workshop">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,11 +36,11 @@
 
       <!-- Desktop nav links -->
       <ul class="hidden md:flex items-center gap-8">
-        <li><a href="#hero" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">首頁</a></li>
-        <li><a href="#architecture" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">架構</a></li>
-        <li><a href="#order" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">點餐</a></li>
-        <li><a href="#menu" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">菜單</a></li>
-        <li><a href="#inventory" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">庫存</a></li>
+        <li><a href="#hero" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Home</a></li>
+        <li><a href="#architecture" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Architecture</a></li>
+        <li><a href="#order" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Order</a></li>
+        <li><a href="#menu" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Menu</a></li>
+        <li><a href="#inventory" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Inventory</a></li>
       </ul>
 
       <!-- Mobile hamburger button -->
@@ -55,11 +55,11 @@
 
     <!-- Mobile menu (hidden by default) -->
     <ul id="mobile-menu" class="hidden md:hidden flex-col gap-2 px-4 pb-4">
-      <li><a href="#hero" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">首頁</a></li>
-      <li><a href="#architecture" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">架構</a></li>
-      <li><a href="#order" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">點餐</a></li>
-      <li><a href="#menu" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">菜單</a></li>
-      <li><a href="#inventory" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">庫存</a></li>
+      <li><a href="#hero" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Home</a></li>
+      <li><a href="#architecture" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Architecture</a></li>
+      <li><a href="#order" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Order</a></li>
+      <li><a href="#menu" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Menu</a></li>
+      <li><a href="#inventory" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">Inventory</a></li>
     </ul>
   </header>
 
@@ -81,10 +81,10 @@
             EventStorming<br class="sm:hidden"> Coffeeshop
           </h1>
           <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed">
-            透過 Domain Driven Design 與 Event Storming 工作坊，探索雲端原生微服務架構
+            Explore cloud-native microservice architecture through Domain Driven Design and Event Storming workshop
           </p>
           <a href="#order" class="inline-block bg-green-500 text-white px-8 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">
-            開始點餐體驗
+            Start Ordering
           </a>
         </div>
 
@@ -103,7 +103,7 @@
               </svg>
               <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Orders</h3>
             </div>
-            <p class="text-slate-300 text-sm leading-relaxed">訂單建立、狀態追蹤與桌號管理</p>
+            <p class="text-slate-300 text-sm leading-relaxed">Order creation, status tracking, and table management</p>
           </div>
 
           <!-- Coffee card -->
@@ -118,7 +118,7 @@
               </svg>
               <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Coffee</h3>
             </div>
-            <p class="text-slate-300 text-sm leading-relaxed">咖啡製作、食譜管理與品項客製化</p>
+            <p class="text-slate-300 text-sm leading-relaxed">Coffee making, recipe management, and customization</p>
           </div>
 
           <!-- Inventory card -->
@@ -132,7 +132,7 @@
               </svg>
               <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Inventory</h3>
             </div>
-            <p class="text-slate-300 text-sm leading-relaxed">原物料庫存監控與自動補貨通知</p>
+            <p class="text-slate-300 text-sm leading-relaxed">Raw material inventory monitoring and auto-restock alerts</p>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@
          ================================================================ -->
     <section id="architecture" class="py-20">
       <div class="max-w-7xl mx-auto px-4">
-        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">DDD 架構總覽</h2>
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">DDD Architecture Overview</h2>
 
         <!-- Architecture diagram placeholder (JS will populate) -->
         <div id="architecture-diagram" class="min-h-[400px] glass-card p-6 mb-12 flex items-center justify-center">
@@ -244,26 +244,26 @@
          ================================================================ -->
     <section id="order" class="py-20">
       <div class="max-w-7xl mx-auto px-4">
-        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">互動式點餐</h2>
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">Interactive Ordering</h2>
 
         <div class="max-w-2xl mx-auto">
           <form id="order-form" class="glass-card p-8" novalidate>
             <div class="grid gap-6">
               <!-- Table number -->
               <div>
-                <label for="table-no" class="block text-sm font-medium text-slate-300 mb-2">桌號</label>
+                <label for="table-no" class="block text-sm font-medium text-slate-300 mb-2">Table No.</label>
                 <select id="table-no" name="tableNo" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
-                  <option value="1">桌號 1</option>
-                  <option value="2">桌號 2</option>
-                  <option value="3">桌號 3</option>
-                  <option value="4">桌號 4</option>
-                  <option value="5">桌號 5</option>
+                  <option value="1">Table 1</option>
+                  <option value="2">Table 2</option>
+                  <option value="3">Table 3</option>
+                  <option value="4">Table 4</option>
+                  <option value="5">Table 5</option>
                 </select>
               </div>
 
               <!-- Coffee item -->
               <div>
-                <label for="product" class="block text-sm font-medium text-slate-300 mb-2">咖啡品項</label>
+                <label for="product" class="block text-sm font-medium text-slate-300 mb-2">Coffee Item</label>
                 <select id="product" name="product" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
                   <option value="espresso">Espresso</option>
                   <option value="americano">Americano</option>
@@ -274,7 +274,7 @@
 
               <!-- Size -->
               <div>
-                <label for="size" class="block text-sm font-medium text-slate-300 mb-2">杯型</label>
+                <label for="size" class="block text-sm font-medium text-slate-300 mb-2">Size</label>
                 <select id="size" name="size" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
                   <!-- Populated by JS -->
                 </select>
@@ -288,7 +288,7 @@
 
               <!-- Submit button -->
               <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">
-                送出訂單
+                Submit Order
               </button>
             </div>
           </form>
@@ -304,7 +304,7 @@
          ================================================================ -->
     <section id="menu" class="py-20">
       <div class="max-w-7xl mx-auto px-4">
-        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">咖啡菜單</h2>
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">Coffee Menu</h2>
 
         <!-- Skeleton loaders (shown while data loads) -->
         <div id="menu-skeleton" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -356,7 +356,7 @@
          ================================================================ -->
     <section id="inventory" class="py-20">
       <div class="max-w-7xl mx-auto px-4">
-        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">庫存狀態</h2>
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">Inventory Status</h2>
 
         <!-- Skeleton loaders (shown while data loads) -->
         <div id="inventory-skeleton" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

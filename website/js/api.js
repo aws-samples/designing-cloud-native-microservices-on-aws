@@ -17,7 +17,7 @@
  * @param {string} url - Request URL
  * @param {RequestInit} [options={}] - Fetch options
  * @returns {Promise<Response>} The fetch Response object
- * @throws {Error} On timeout ('請求逾時') or network error
+ * @throws {Error} On timeout ('Request timed out') or network error
  */
 async function apiFetch(url, options = {}) {
   const controller = new AbortController();
@@ -31,7 +31,7 @@ async function apiFetch(url, options = {}) {
   } catch (error) {
     if (error.name === 'AbortError') {
       console.log(`[API] ${method} ${url} → TIMEOUT`);
-      throw new Error('請求逾時');
+      throw new Error('Request timed out');
     }
     console.log(`[API] ${method} ${url} → ERROR`);
     throw new Error(error.message);
@@ -56,7 +56,7 @@ async function createOrder(orderData) {
   });
 
   if (!response.ok) {
-    throw new Error('訂單建立失敗，請稍後再試');
+    throw new Error('Order creation failed, please try again later');
   }
 
   return response.json();
