@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventStorming Coffeeshop</title>
+  <meta name="description" content="透過 Domain Driven Design 與 Event Storming 工作坊，探索雲端原生微服務架構">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-[#0F172A] text-[#F8FAFC] font-['IBM_Plex_Sans']">
+
+  <!-- ================================================================
+       Section 1: Navigation Bar (fixed top)
+       ================================================================ -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#0F172A]/95 backdrop-blur-md border-b border-white/10">
+    <nav id="nav" class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16" aria-label="Main navigation">
+      <a href="#hero" class="font-['JetBrains_Mono'] font-bold text-lg text-[#F8FAFC] cursor-pointer transition-all duration-200 hover:text-green-500">
+        EventStorming Coffeeshop
+      </a>
+
+      <!-- Desktop nav links -->
+      <ul class="hidden md:flex items-center gap-8">
+        <li><a href="#hero" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">首頁</a></li>
+        <li><a href="#architecture" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">架構</a></li>
+        <li><a href="#order" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">點餐</a></li>
+        <li><a href="#menu" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">菜單</a></li>
+        <li><a href="#inventory" class="text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">庫存</a></li>
+      </ul>
+
+      <!-- Mobile hamburger button -->
+      <button id="mobile-menu-btn" type="button" class="md:hidden cursor-pointer transition-all duration-200 text-slate-300 hover:text-green-500 p-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle navigation menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Mobile menu (hidden by default) -->
+    <ul id="mobile-menu" class="hidden md:hidden flex-col gap-2 px-4 pb-4">
+      <li><a href="#hero" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">首頁</a></li>
+      <li><a href="#architecture" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">架構</a></li>
+      <li><a href="#order" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">點餐</a></li>
+      <li><a href="#menu" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">菜單</a></li>
+      <li><a href="#inventory" class="block py-2 text-sm text-slate-300 hover:text-green-500 cursor-pointer transition-all duration-200">庫存</a></li>
+    </ul>
+  </header>
+
+  <main>
+    <!-- ================================================================
+         Section 2: Hero
+         ================================================================ -->
+    <section id="hero" class="relative pt-32 pb-20 overflow-hidden">
+      <!-- Hero background image -->
+      <div class="absolute inset-0 z-0">
+        <img src="assets/images/hero-coffeeshop.jpg" alt="Coffeeshop atmosphere background" class="w-full h-full object-cover opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-b from-[#0F172A]/60 via-[#0F172A]/80 to-[#0F172A]"></div>
+      </div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-4">
+        <!-- Hero text -->
+        <div class="text-center mb-16">
+          <h1 class="font-['JetBrains_Mono'] text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+            EventStorming<br class="sm:hidden"> Coffeeshop
+          </h1>
+          <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+            透過 Domain Driven Design 與 Event Storming 工作坊，探索雲端原生微服務架構
+          </p>
+          <a href="#order" class="inline-block bg-green-500 text-white px-8 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">
+            開始點餐體驗
+          </a>
+        </div>
+
+        <!-- Bounded Context summary cards -->
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Orders card -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <path d="M12 11h4"></path>
+                <path d="M12 16h4"></path>
+                <path d="M8 11h.01"></path>
+                <path d="M8 16h.01"></path>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Orders</h3>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed">訂單建立、狀態追蹤與桌號管理</p>
+          </div>
+
+          <!-- Coffee card -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+                <line x1="6" y1="2" x2="6" y2="4"></line>
+                <line x1="10" y1="2" x2="10" y2="4"></line>
+                <line x1="14" y1="2" x2="14" y2="4"></line>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Coffee</h3>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed">咖啡製作、食譜管理與品項客製化</p>
+          </div>
+
+          <!-- Inventory card -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <path d="M16.5 9.4 7.55 4.24"></path>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.29 7 12 12 20.71 7"></polyline>
+                <line x1="12" y1="22" x2="12" y2="12"></line>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Inventory</h3>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed">原物料庫存監控與自動補貨通知</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Section 3: Architecture
+         ================================================================ -->
+    <section id="architecture" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">DDD 架構總覽</h2>
+
+        <!-- Architecture diagram placeholder (JS will populate) -->
+        <div id="architecture-diagram" class="min-h-[400px] glass-card p-6 mb-12 flex items-center justify-center">
+          <p class="text-slate-400 text-sm font-['JetBrains_Mono']">Loading architecture diagram…</p>
+        </div>
+
+        <!-- Detail cards -->
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Orders detail -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <path d="M12 11h4"></path>
+                <path d="M12 16h4"></path>
+                <path d="M8 11h.01"></path>
+                <path d="M8 16h.01"></path>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Orders Context</h3>
+            </div>
+            <dl class="space-y-3 text-sm">
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Aggregate Root</dt>
+                <dd class="font-['JetBrains_Mono'] text-green-500">Order</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Domain Events</dt>
+                <dd class="text-slate-300">OrderCreated, OrderStatusChanged</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">API Endpoint</dt>
+                <dd class="font-['JetBrains_Mono'] text-slate-300">POST /order</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Coffee detail -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+                <line x1="6" y1="2" x2="6" y2="4"></line>
+                <line x1="10" y1="2" x2="10" y2="4"></line>
+                <line x1="14" y1="2" x2="14" y2="4"></line>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Coffee Context</h3>
+            </div>
+            <dl class="space-y-3 text-sm">
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Aggregate Root</dt>
+                <dd class="font-['JetBrains_Mono'] text-green-500">Coffee</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Domain Events</dt>
+                <dd class="text-slate-300">CoffeeStatus</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">API Endpoint</dt>
+                <dd class="font-['JetBrains_Mono'] text-slate-300">GET /coffee</dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Inventory detail -->
+          <div class="glass-card p-6 cursor-pointer transition-all duration-200 hover:border-green-500/50">
+            <div class="flex items-center gap-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 shrink-0" aria-hidden="true">
+                <path d="M16.5 9.4 7.55 4.24"></path>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.29 7 12 12 20.71 7"></polyline>
+                <line x1="12" y1="22" x2="12" y2="12"></line>
+              </svg>
+              <h3 class="font-['JetBrains_Mono'] font-semibold text-lg">Inventory Context</h3>
+            </div>
+            <dl class="space-y-3 text-sm">
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Aggregate Root</dt>
+                <dd class="font-['JetBrains_Mono'] text-green-500">Inventory</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">Domain Events</dt>
+                <dd class="text-slate-300">StockChanged</dd>
+              </div>
+              <div>
+                <dt class="text-slate-400 text-xs uppercase tracking-wider mb-1">API Endpoint</dt>
+                <dd class="font-['JetBrains_Mono'] text-slate-300">GET /inventory</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Section 4: Order Form
+         ================================================================ -->
+    <section id="order" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">互動式點餐</h2>
+
+        <div class="max-w-2xl mx-auto">
+          <form id="order-form" class="glass-card p-8" novalidate>
+            <div class="grid gap-6">
+              <!-- Table number -->
+              <div>
+                <label for="table-no" class="block text-sm font-medium text-slate-300 mb-2">桌號</label>
+                <select id="table-no" name="tableNo" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
+                  <option value="1">桌號 1</option>
+                  <option value="2">桌號 2</option>
+                  <option value="3">桌號 3</option>
+                  <option value="4">桌號 4</option>
+                  <option value="5">桌號 5</option>
+                </select>
+              </div>
+
+              <!-- Coffee item -->
+              <div>
+                <label for="product" class="block text-sm font-medium text-slate-300 mb-2">咖啡品項</label>
+                <select id="product" name="product" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
+                  <option value="espresso">Espresso</option>
+                  <option value="americano">Americano</option>
+                  <option value="latte">Latte</option>
+                  <option value="cappuccino">Cappuccino</option>
+                </select>
+              </div>
+
+              <!-- Size -->
+              <div>
+                <label for="size" class="block text-sm font-medium text-slate-300 mb-2">杯型</label>
+                <select id="size" name="size" class="w-full bg-[#1E293B] border border-white/20 rounded-lg p-3 text-white cursor-pointer transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A] focus:border-green-500">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+
+              <!-- Customizations (populated by JS) -->
+              <div id="customizations"></div>
+
+              <!-- Order total -->
+              <div id="order-total" class="text-2xl font-bold text-green-500 font-['JetBrains_Mono'] text-center py-2"></div>
+
+              <!-- Submit button -->
+              <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:opacity-90 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">
+                送出訂單
+              </button>
+            </div>
+          </form>
+
+          <!-- Order result -->
+          <div id="order-result" class="mt-6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Section 5: Menu
+         ================================================================ -->
+    <section id="menu" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">咖啡菜單</h2>
+
+        <!-- Skeleton loaders (shown while data loads) -->
+        <div id="menu-skeleton" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="glass-card overflow-hidden" role="status" aria-label="Loading menu item">
+            <div class="h-48 bg-[#334155] motion-safe:animate-pulse"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-3/4"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card overflow-hidden" role="status" aria-label="Loading menu item">
+            <div class="h-48 bg-[#334155] motion-safe:animate-pulse"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-3/4"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card overflow-hidden hidden lg:block" role="status" aria-label="Loading menu item">
+            <div class="h-48 bg-[#334155] motion-safe:animate-pulse"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-3/4"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card overflow-hidden hidden lg:block" role="status" aria-label="Loading menu item">
+            <div class="h-48 bg-[#334155] motion-safe:animate-pulse"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-3/4"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+        </div>
+
+        <!-- Menu cards container (JS populates this) -->
+        <div id="menu-container" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         Section 6: Inventory
+         ================================================================ -->
+    <section id="inventory" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="font-['JetBrains_Mono'] text-3xl font-bold mb-12 text-center">庫存狀態</h2>
+
+        <!-- Skeleton loaders (shown while data loads) -->
+        <div id="inventory-skeleton" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="glass-card p-6" role="status" aria-label="Loading inventory item">
+            <div class="space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-2/3"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-3 bg-[#334155] rounded-full motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card p-6" role="status" aria-label="Loading inventory item">
+            <div class="space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-2/3"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-3 bg-[#334155] rounded-full motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card p-6 hidden lg:block" role="status" aria-label="Loading inventory item">
+            <div class="space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-2/3"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-3 bg-[#334155] rounded-full motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+          <div class="glass-card p-6 hidden lg:block" role="status" aria-label="Loading inventory item">
+            <div class="space-y-3">
+              <div class="h-5 bg-[#334155] rounded motion-safe:animate-pulse w-2/3"></div>
+              <div class="h-4 bg-[#334155] rounded motion-safe:animate-pulse w-1/2"></div>
+              <div class="h-3 bg-[#334155] rounded-full motion-safe:animate-pulse w-full"></div>
+            </div>
+            <span class="sr-only">Loading…</span>
+          </div>
+        </div>
+
+        <!-- Inventory cards container (JS populates this) -->
+        <div id="inventory-container" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================================================
+       Section 7: Footer
+       ================================================================ -->
+  <footer class="border-t border-white/10 py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <!-- Left: copyright -->
+        <p class="text-slate-400 text-sm">EventStorming Coffeeshop &copy; 2026</p>
+
+        <!-- Right: links & license -->
+        <div class="flex items-center gap-6">
+          <a href="https://github.com/anthropics/eventstorming-coffeeshop" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-slate-400 hover:text-green-500 cursor-pointer transition-all duration-200 text-sm" aria-label="View source on GitHub">
+            <!-- Lucide github icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+              <path d="M9 18c-4.51 2-5-2-7-2"></path>
+            </svg>
+            <span>GitHub</span>
+          </a>
+          <span class="text-slate-500 text-sm">MIT-0 License</span>
+        </div>
+      </div>
+
+      <!-- Attribution -->
+      <p class="text-center text-slate-500 text-xs mt-6">Photos from Pexels</p>
+    </div>
+  </footer>
+
+  <!-- ================================================================
+       Scripts (loaded in order)
+       ================================================================ -->
+  <script src="js/config.js"></script>
+  <script src="js/fallback-data.js"></script>
+  <script src="js/utils/dom.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components/navigation.js"></script>
+  <script src="js/components/hero.js"></script>
+  <script src="js/components/architecture.js"></script>
+  <script src="js/components/order-form.js"></script>
+  <script src="js/components/menu.js"></script>
+  <script src="js/components/inventory.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

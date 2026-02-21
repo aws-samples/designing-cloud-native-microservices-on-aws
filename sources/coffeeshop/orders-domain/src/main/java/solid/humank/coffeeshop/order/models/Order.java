@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 @RegisterForReflection
 public class Order extends AggregateRoot<OrderId> {
 
@@ -47,23 +48,18 @@ public class Order extends AggregateRoot<OrderId> {
     final static String DATE_FORMAT = "yyyyMMddHHmmss";
 
 
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private String tableNo;
 
 
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private OrderStatus status;
 
 
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private List<OrderItem> orderItems;
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private OffsetDateTime createdDate;
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private OffsetDateTime modifiedDate;
 
