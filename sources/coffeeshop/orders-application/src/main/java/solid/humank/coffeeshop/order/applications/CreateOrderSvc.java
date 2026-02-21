@@ -16,34 +16,34 @@ import solid.humank.coffeeshop.order.models.OrderStatus;
 import solid.humank.ddd.commons.interfaces.ITranslator;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.List;
 
 
-@ApplicationScoped
+@Service
 public class CreateOrderSvc implements Serializable {
 
-    //TODO 確認實作結果
+    //TODO verify implementation result
 
-    @Inject @Dependent
+    @Autowired
     public IOrderRepository repository;
-    @Inject @Dependent
+    @Autowired
     public ITranslator<List<OrderItem>, List<OrderItemRst>> translator;
-    @Inject
+    @Autowired
     DomainEventPublisher domainEventPublisher;
     Logger logger = LoggerFactory.getLogger(CreateOrderSvc.class);
 
     /**
-     * 咖啡師 會接受訂單，並且開始依照訂單上的產品去冰箱取得原物料
-     * 咖啡師會定期更新訂單狀態
+     * The barista accepts the order and retrieves ingredients from the fridge
+     * based on the products listed in the order.
+     * The barista periodically updates the order status.
      * <p>
-     * 所以咖啡師和訂單的BC是Partner關係
-     * 訂單不會直接影響到庫存
-     * 這邊你寫在哪?
-     * 但是咖啡師取冰箱的時候，如果已經不足，會去同步取/扣庫存
+     * The barista and order BCs have a Partner relationship.
+     * Orders do not directly affect inventory.
+     * However, when the barista retrieves from the fridge and stock is insufficient,
+     * inventory is synchronously fetched/deducted.
      * <p>
      * Producer --> Event <-- Consumer
      * OrderDomain |OrderCreated | Coffee to accept the order

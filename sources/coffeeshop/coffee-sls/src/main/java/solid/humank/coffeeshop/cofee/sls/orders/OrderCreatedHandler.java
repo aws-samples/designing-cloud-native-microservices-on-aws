@@ -13,7 +13,6 @@ import solid.humank.coffeeshop.coffee.repositories.CoffeeRepository;
 import solid.humank.coffeeshop.inventories.applicationservices.ConfirmInventorySvc;
 import solid.humank.ddd.commons.utilities.DomainModelMapper;
 
-import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Named("test")
 public class OrderCreatedHandler implements RequestStreamHandler {
 
 //    @Inject
@@ -50,7 +48,7 @@ public class OrderCreatedHandler implements RequestStreamHandler {
         logger.info(String.valueOf(orderCreated.getDetail().getOrderItems().size()));
         logger.info(orderCreated.getDetail().getEntityId().toString());
 
-        //TODO : 調用咖啡師的服務, 參照需求文檔找製作美式咖啡的需求
+        //TODO : Invoke barista service, refer to requirements doc for making americano
         MakeCoffeeMsg cmd = new MakeCoffeeMsg(orderCreated.getDetail().getTableNo(), transformToCoffeeItemVM(orderCreated));
         service.make(cmd);
 

@@ -320,14 +320,14 @@ async function submitOrder(e) {
   // Loading state
   var originalText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.textContent = '送出中...';
+  submitBtn.textContent = 'Submitting...';
   submitBtn.classList.add('opacity-60');
 
   try {
     var result = await createOrder(orderData);
     showOrderResult(result, true);
   } catch (err) {
-    showOrderResult({ message: err.message || '訂單建立失敗，請稍後再試' }, false);
+    showOrderResult({ message: err.message || 'Order creation failed, please try again later' }, false);
   } finally {
     // Restore button
     submitBtn.disabled = false;
@@ -369,8 +369,8 @@ function showOrderResult(result, isSuccess) {
       '<polyline points="22 4 12 14.01 9 11.01"></polyline>' +
       '</svg>' +
       '<div>' +
-      '<p class="text-lg font-semibold text-green-500 font-[\'JetBrains_Mono\'] mb-1">訂單建立成功</p>' +
-      '<p class="text-sm text-slate-300">訂單編號：' +
+      '<p class="text-lg font-semibold text-green-500 font-[\'JetBrains_Mono\'] mb-1">Order created successfully</p>' +
+      '<p class="text-sm text-slate-300">Order ID: ' +
       '<span class="font-[\'JetBrains_Mono\'] text-[#F8FAFC]">' + (result.id || result.orderId || 'N/A') + '</span>' +
       '</p>' +
       '</div>';
@@ -387,14 +387,14 @@ function showOrderResult(result, isSuccess) {
       '<line x1="12" y1="16" x2="12.01" y2="16"></line>' +
       '</svg>' +
       '<div>' +
-      '<p class="text-lg font-semibold text-red-400 font-[\'JetBrains_Mono\'] mb-1">訂單建立失敗</p>' +
-      '<p class="text-sm text-slate-300 mb-3">' + (result.message || '發生未知錯誤') + '</p>' +
+      '<p class="text-lg font-semibold text-red-400 font-[\'JetBrains_Mono\'] mb-1">Order creation failed</p>' +
+      '<p class="text-sm text-slate-300 mb-3">' + (result.message || 'An unknown error occurred') + '</p>' +
       '</div>' +
       '<button type="button" onclick="submitOrder()" ' +
       'class="px-5 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold ' +
       'cursor-pointer transition-all duration-200 hover:opacity-90 ' +
       'focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0F172A]">' +
-      '重新送出' +
+      'Retry' +
       '</button>';
   }
 

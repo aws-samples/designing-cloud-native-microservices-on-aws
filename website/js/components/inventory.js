@@ -35,7 +35,7 @@ async function loadInventoryData() {
     renderInventoryDashboard(items);
   } catch (error) {
     hideSkeleton(skeletonId);
-    showError(containerId, error.message || '無法載入庫存資料，請稍後再試', loadInventoryData);
+    showError(containerId, error.message || 'Failed to load inventory, please try again later', loadInventoryData);
   }
 }
 
@@ -57,7 +57,7 @@ function renderInventoryDashboard(items) {
 
   if (!items || items.length === 0) {
     container.innerHTML =
-      '<p class="col-span-full text-center text-slate-400 text-sm py-12">目前沒有庫存資料</p>';
+      '<p class="col-span-full text-center text-slate-400 text-sm py-12">No inventory data available</p>';
     return;
   }
 
@@ -83,7 +83,7 @@ function createInventoryCard(item) {
     'focus-within:ring-offset-2 focus-within:ring-offset-[#0F172A]';
   card.setAttribute('data-inventory-id', item.id);
   card.setAttribute('tabindex', '0');
-  card.setAttribute('aria-label', item.name + ' — ' + item.current + ' ' + item.unit + '（共 ' + item.max + '）');
+  card.setAttribute('aria-label', item.name + ' — ' + item.current + ' ' + item.unit + ' (of ' + item.max + ')');
 
   var html = '';
 
@@ -111,7 +111,7 @@ function createInventoryCard(item) {
       '<h3 class="font-[\'JetBrains_Mono\'] font-semibold text-base text-[#F8FAFC] truncate">' +
         escapeHtml(item.name) +
       '</h3>' +
-      '<span class="text-xs text-slate-400">單位：' + escapeHtml(item.unit) + '</span>' +
+      '<span class="text-xs text-slate-400">Unit: ' + escapeHtml(item.unit) + '</span>' +
     '</div>';
 
   html += '</div>';
@@ -137,7 +137,7 @@ function createInventoryCard(item) {
       'aria-valuenow="' + item.current + '" ' +
       'aria-valuemin="0" ' +
       'aria-valuemax="' + item.max + '" ' +
-      'aria-label="' + escapeAttr(item.name) + ' 庫存量">' +
+      'aria-label="' + escapeAttr(item.name) + ' stock level">' +
       '<div class="inventory-progress-bar h-full rounded-full transition-all duration-500 ease-out ' +
         barColorClass + '" ' +
         'style="width: 0%;" ' +
@@ -148,21 +148,21 @@ function createInventoryCard(item) {
 
   // Status badge
   html += '<div class="flex items-center justify-between">';
-  html += '<span class="text-xs text-slate-400">' + percentage + '% 庫存</span>';
+  html += '<span class="text-xs text-slate-400">' + percentage + '% stock</span>';
 
   if (isLow) {
     html +=
       '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ' +
         'bg-red-500/10 text-red-400 text-xs font-medium">' +
         inventoryAlertSvg() +
-        '庫存不足' +
+        'Low Stock' +
       '</span>';
   } else {
     html +=
       '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ' +
         'bg-green-500/10 text-green-500 text-xs font-medium">' +
         inventoryCheckSvg() +
-        '庫存充足' +
+        'In Stock' +
       '</span>';
   }
 

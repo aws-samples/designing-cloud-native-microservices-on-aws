@@ -1,39 +1,39 @@
-# 設計文件：EventStorming Coffeeshop 展示網站
+# Design Document: EventStorming Coffeeshop Showcase Website
 
-## 概述
+## Overview
 
-本設計文件描述 EventStorming Coffeeshop 展示網站的前端架構與實作方案。網站為單頁式靜態應用（HTML + Tailwind CSS + Vanilla JS），串接三個 Java Spring Boot 微服務（Orders、Coffee、Inventory），讓訪客能互動體驗 DDD 微服務架構的咖啡店業務流程。
+This design document describes the frontend architecture and implementation plan for the EventStorming Coffeeshop showcase website. The website is a single-page static application (HTML + Tailwind CSS + Vanilla JS) that integrates with three Java Spring Boot microservices (Orders, Coffee, Inventory), allowing visitors to interactively experience the coffee shop business flow built on DDD microservice architecture.
 
-網站遵循已定義的設計系統（深色主題 `#0F172A`、JetBrains Mono + IBM Plex Sans 字型、Vibrant & Block-based 風格），並使用 Lucide Icons SVG 圖示。所有 API 呼叫皆具備降級方案（fallback data），確保後端離線時仍可展示靜態內容。
+The website follows the defined design system (dark theme `#0F172A`, JetBrains Mono + IBM Plex Sans fonts, Vibrant & Block-based style) and uses Lucide Icons SVG icons. All API calls have fallback mechanisms to ensure static content is displayed when the backend is offline.
 
-### 核心設計決策
+### Core Design Decisions
 
-| 決策 | 選擇 | 理由 |
-|------|------|------|
-| 框架 | 無框架（Vanilla JS） | 展示型網站，無需 SPA 框架的複雜度 |
-| 樣式 | Tailwind CSS CDN | 快速開發，與設計系統色彩直接對應 |
-| 狀態管理 | 模組化全域物件 | 簡單直覺，無需狀態管理庫 |
-| API 層 | Fetch wrapper + AbortController | 原生支援，含逾時與重試機制 |
-| 圖示 | Lucide Icons（inline SVG） | 一致性、輕量、無外部依賴 |
-| 降級方案 | 靜態 JSON fallback | 後端離線時仍可展示完整 UI |
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Framework | No framework (Vanilla JS) | Showcase website, no need for SPA framework complexity |
+| Styling | Tailwind CSS CDN | Rapid development, direct mapping to design system colors |
+| State Management | Modular global object | Simple and intuitive, no state management library needed |
+| API Layer | Fetch wrapper + AbortController | Native support with timeout and retry mechanisms |
+| Icons | Lucide Icons (inline SVG) | Consistency, lightweight, no external dependencies |
+| Fallback | Static JSON fallback | Full UI display when backend is offline |
 
 ---
 
-## 架構
+## Architecture
 
-### 高層架構圖
+### High-Level Architecture Diagram
 
 ```mermaid
 graph TB
-    subgraph "前端 - 單頁式網站"
-        HTML["index.html<br/>Tailwind CSS + 語意化 HTML"]
-        JS["app.js<br/>主程式進入點"]
-        API["api.js<br/>API 整合層"]
-        CONFIG["config.js<br/>環境設定"]
-        FALLBACK["fallback-data.js<br/>降級靜態資料"]
+    subgraph "Frontend - Single Page Website"
+        HTML["index.html<br/>Tailwind CSS + Semantic HTML"]
+        JS["app.js<br/>Main Entry Point"]
+        API["api.js<br/>API Integration Layer"]
+        CONFIG["config.js<br/>Environment Config"]
+        FALLBACK["fallback-data.js<br/>Fallback Static Data"]
     end
 
-    subgraph "後端微服務"
+    subgraph "Backend Microservices"
         ORDERS["Orders Service<br/>POST /order"]
         COFFEE["Coffee Service<br/>GET /coffee"]
         INVENTORY["Inventory Service<br/>GET /inventory<br/>PUT /inventory"]
@@ -47,44 +47,44 @@ graph TB
     API -->|HTTP| INVENTORY
 ```
 
-### 後端 API 端點對應（源自實際後端程式碼）
+### Backend API Endpoint Mapping (from actual backend code)
 
-| 微服務 | 端點 | 方法 | 說明 | 後端 Controller |
-|--------|------|------|------|-----------------|
-| Orders | `/order` | POST | 建立訂單 | `OrderResource.createOrder()` |
-| Coffee | `/coffee` | GET | 取得咖啡品項列表 | `CoffeeResource.listCoffees()` |
-| Inventory | `/inventory` | GET | 取得庫存狀態 | `InventoryResource.sayHello()` |
-| Inventory | `/inventory` | PUT | 扣減庫存 | `InventoryResource.takeOut()` |
+| Microservice | Endpoint | Method | Description | Backend Controller |
+|-------------|----------|--------|-------------|-------------------|
+| Orders | `/order` | POST | Create order | `OrderResource.createOrder()` |
+| Coffee | `/coffee` | GET | Get coffee item list | `CoffeeResource.listCoffees()` |
+| Inventory | `/inventory` | GET | Get inventory status | `InventoryResource.sayHello()` |
+| Inventory | `/inventory` | PUT | Deduct inventory | `InventoryResource.takeOut()` |
 
-> **備註：** 後端 Coffee 與 Inventory 的 API 目前為簡化實作（回傳字串），前端設計以完整資料結構為目標，搭配 fallback data 確保展示效果。
+> **Note:** The backend Coffee and Inventory APIs currently have simplified implementations (returning strings). The frontend design targets complete data structures, paired with fallback data to ensure showcase quality.
 
 ---
 
-## 元件與介面
+## Components and Interfaces
 
-### 檔案結構
+### File Structure
 
 ```
 website/
-├── index.html              # 主頁面（所有區塊）
+├── index.html              # Main page (all sections)
 ├── css/
-│   └── custom.css          # 自訂樣式（CSS 變數、glassmorphism、動畫）
+│   └── custom.css          # Custom styles (CSS variables, glassmorphism, animations)
 ├── js/
-│   ├── config.js           # API 基礎位址設定
-│   ├── api.js              # Fetch wrapper（逾時、重試、日誌）
-│   ├── fallback-data.js    # 降級靜態資料
-│   ├── app.js              # 主程式（初始化、事件綁定）
+│   ├── config.js           # API base URL configuration
+│   ├── api.js              # Fetch wrapper (timeout, retry, logging)
+│   ├── fallback-data.js    # Fallback static data
+│   ├── app.js              # Main program (initialization, event binding)
 │   ├── components/
-│   │   ├── navigation.js   # 導覽列互動（滾動高亮、手機選單）
-│   │   ├── hero.js         # Hero 區塊動態效果
-│   │   ├── architecture.js # 架構圖互動（hover 高亮）
-│   │   ├── order-form.js   # 點餐表單邏輯（品項選擇、價格計算、提交）
-│   │   ├── menu.js         # 菜單卡片（載入、展開細節）
-│   │   └── inventory.js    # 庫存儀表板（載入、進度條更新）
+│   │   ├── navigation.js   # Navigation bar interactions (scroll highlight, mobile menu)
+│   │   ├── hero.js         # Hero section dynamic effects
+│   │   ├── architecture.js # Architecture diagram interactions (hover highlight)
+│   │   ├── order-form.js   # Order form logic (item selection, price calculation, submission)
+│   │   ├── menu.js         # Menu cards (loading, detail expansion)
+│   │   └── inventory.js    # Inventory dashboard (loading, progress bar updates)
 │   └── utils/
-│       └── dom.js          # DOM 工具函式（骨架載入、錯誤訊息）
+│       └── dom.js          # DOM utility functions (skeleton loading, error messages)
 └── assets/
-    └── images/             # 已下載的產品圖片
+    └── images/             # Downloaded product images
         ├── espresso.jpg
         ├── americano.jpg
         ├── latte.jpg
@@ -94,18 +94,18 @@ website/
         └── hero-coffeeshop.jpg
 ```
 
-### 元件分解
+### Component Decomposition
 
 ```mermaid
 graph TD
-    PAGE["index.html 單頁"]
-    NAV["Navigation Bar<br/>固定頂部、錨點連結、手機漢堡選單"]
-    HERO["Hero Section<br/>標題、副標題、CTA、3 張 BC 摘要卡片"]
-    ARCH["Architecture Diagram<br/>3 個 BC 視覺化、hover 高亮、說明卡片"]
-    ORDER["Order Form<br/>桌號、品項、杯型、客製化、價格計算、提交"]
-    MENU["Menu Cards<br/>4 種咖啡、食譜細節、展開/收合"]
-    INV["Inventory Dashboard<br/>4 種原物料、進度條、低庫存警告"]
-    FOOTER["Footer<br/>專案資訊、GitHub 連結"]
+    PAGE["index.html Single Page"]
+    NAV["Navigation Bar<br/>Fixed top, anchor links, mobile hamburger menu"]
+    HERO["Hero Section<br/>Title, subtitle, CTA, 3 BC summary cards"]
+    ARCH["Architecture Diagram<br/>3 BC visualization, hover highlight, description cards"]
+    ORDER["Order Form<br/>Table number, item, size, customization, price calculation, submit"]
+    MENU["Menu Cards<br/>4 coffees, recipe details, expand/collapse"]
+    INV["Inventory Dashboard<br/>4 raw materials, progress bars, low stock warning"]
+    FOOTER["Footer<br/>Project info, GitHub link"]
 
     PAGE --> NAV
     PAGE --> HERO
@@ -116,91 +116,91 @@ graph TD
     PAGE --> FOOTER
 ```
 
-### 元件介面定義
+### Component Interface Definitions
 
-#### Navigation（navigation.js）
+#### Navigation (navigation.js)
 
 ```javascript
-// 初始化導覽列行為
+// Initialize navigation bar behavior
 function initNavigation() → void
-// 更新滾動時的 active 錨點高亮
+// Update active anchor highlight on scroll
 function updateActiveSection() → void
-// 切換手機版漢堡選單
+// Toggle mobile hamburger menu
 function toggleMobileMenu() → void
 ```
 
-#### Order Form（order-form.js）
+#### Order Form (order-form.js)
 
 ```javascript
-// 初始化點餐表單
+// Initialize order form
 function initOrderForm() → void
-// 根據選擇的咖啡品項更新杯型與客製化選項
+// Update size and customization options based on selected coffee item
 function updateSizeOptions(productId: string) → void
-// 根據選擇的品項更新客製化選項（奶泡、豆漿、鮮奶油）
+// Update customization options based on selected item (foam, soy milk, whipped cream)
 function updateCustomizations(productId: string) → void
-// 即時計算訂單總金額
+// Calculate order total in real-time
 function calculateTotal() → number
-// 提交訂單至 Orders Service
+// Submit order to Orders Service
 async function submitOrder() → OrderResponse | Error
-// 顯示訂單結果（成功/失敗）
+// Display order result (success/failure)
 function showOrderResult(result: OrderResponse | Error) → void
 ```
 
-#### Menu（menu.js）
+#### Menu (menu.js)
 
 ```javascript
-// 載入咖啡品項資料（API 或 fallback）
+// Load coffee item data (API or fallback)
 async function loadMenuData() → CoffeeItem[]
-// 渲染菜單卡片
+// Render menu cards
 function renderMenuCards(items: CoffeeItem[]) → void
-// 切換卡片展開/收合
+// Toggle card expand/collapse
 function toggleCardDetail(cardElement: HTMLElement) → void
 ```
 
-#### Inventory（inventory.js）
+#### Inventory (inventory.js)
 
 ```javascript
-// 載入庫存資料（API 或 fallback）
+// Load inventory data (API or fallback)
 async function loadInventoryData() → InventoryItem[]
-// 渲染庫存儀表板
+// Render inventory dashboard
 function renderInventoryDashboard(items: InventoryItem[]) → void
-// 更新進度條顏色（低於 30% 顯示警告色）
+// Update progress bar color (warning color below 30%)
 function updateStockIndicator(element: HTMLElement, percentage: number) → void
 ```
 
-#### API Layer（api.js）
+#### API Layer (api.js)
 
 ```javascript
-// 通用 fetch wrapper，含逾時（10 秒）、日誌、錯誤處理
+// Generic fetch wrapper with timeout (10s), logging, error handling
 async function apiFetch(url: string, options?: RequestInit) → Response
-// 建立訂單
+// Create order
 async function createOrder(orderData: AddOrderRequest) → OrderResponse
-// 取得咖啡品項列表
+// Get coffee item list
 async function fetchCoffeeMenu() → CoffeeItem[]
-// 取得庫存狀態
+// Get inventory status
 async function fetchInventory() → InventoryItem[]
 ```
 
-#### DOM Utils（dom.js）
+#### DOM Utils (dom.js)
 
 ```javascript
-// 顯示骨架載入佔位元件
+// Show skeleton loading placeholder
 function showSkeleton(containerId: string) → void
-// 隱藏骨架載入佔位元件
+// Hide skeleton loading placeholder
 function hideSkeleton(containerId: string) → void
-// 顯示錯誤訊息與重試按鈕
+// Show error message with retry button
 function showError(containerId: string, message: string, retryFn: Function) → void
-// 隱藏錯誤訊息
+// Hide error message
 function hideError(containerId: string) → void
 ```
 
 ---
 
-## 資料模型
+## Data Models
 
-以下資料模型基於實際後端 Java 原始碼定義，對應前端 JavaScript 物件結構。
+The following data models are based on actual backend Java source code definitions, mapped to frontend JavaScript object structures.
 
-### API 設定（config.js）
+### API Configuration (config.js)
 
 ```javascript
 /** @type {ApiConfig} */
@@ -217,62 +217,62 @@ const API_CONFIG = {
     baseUrl: 'http://localhost:8083',  // Inventory Service
     endpoints: { list: '/inventory' }
   },
-  timeout: 10000  // 10 秒逾時
+  timeout: 10000  // 10-second timeout
 };
 ```
 
-### 訂單相關（對應後端 `AddOrderReq`、`OrderRst`）
+### Order Related (maps to backend `AddOrderReq`, `OrderRst`)
 
 ```javascript
 /**
- * 建立訂單請求
- * 對應後端：solid.humank.coffeeshop.order.models.requests.AddOrderReq
+ * Create order request
+ * Maps to backend: solid.humank.coffeeshop.order.models.requests.AddOrderReq
  * @typedef {Object} AddOrderRequest
- * @property {OrderItemRequest[]} items - 訂單品項列表
+ * @property {OrderItemRequest[]} items - Order item list
  */
 
 /**
- * 訂單品項請求
- * 對應後端：solid.humank.coffeeshop.order.models.requestsmodels.OrderItemRM
+ * Order item request
+ * Maps to backend: solid.humank.coffeeshop.order.models.requests.OrderItemRM
  * @typedef {Object} OrderItemRequest
- * @property {string} productId  - 咖啡品項 ID（如 "espresso", "americano"）
- * @property {number} qty        - 數量
- * @property {number} price      - 單價（BigDecimal → number）
+ * @property {string} productId  - Coffee item ID (e.g. "espresso", "americano")
+ * @property {number} qty        - Quantity
+ * @property {number} price      - Unit price (BigDecimal -> number)
  */
 
 /**
- * 訂單回應
- * 對應後端：solid.humank.coffeeshop.order.datacontracts.results.OrderRst
+ * Order response
+ * Maps to backend: solid.humank.coffeeshop.order.datacontracts.results.OrderRst
  * @typedef {Object} OrderResponse
- * @property {string} id            - 訂單編號（格式：yyyyMMddHHmmss-uuid）
- * @property {number} status        - 訂單狀態（0=INITIAL, 1=PROCESSING, 2=DELIVER, 3=CLOSED, 4=CANCEL）
- * @property {OrderItemResponse[]} items - 訂單品項
- * @property {string} createdDate   - 建立時間（ISO 8601）
- * @property {string} modifiedDate  - 修改時間（ISO 8601）
+ * @property {string} id            - Order number (format: yyyyMMddHHmmss-uuid)
+ * @property {number} status        - Order status (0=INITIAL, 1=PROCESSING, 2=DELIVER, 3=CLOSED, 4=CANCEL)
+ * @property {OrderItemResponse[]} items - Order items
+ * @property {string} createdDate   - Creation time (ISO 8601)
+ * @property {string} modifiedDate  - Modification time (ISO 8601)
  */
 
 /**
- * 訂單品項回應
- * 對應後端：solid.humank.coffeeshop.order.datacontracts.results.OrderItemRst
+ * Order item response
+ * Maps to backend: solid.humank.coffeeshop.order.datacontracts.results.OrderItemRst
  * @typedef {Object} OrderItemResponse
- * @property {string} productId - 品項 ID
- * @property {number} qty       - 數量
- * @property {number} price     - 單價
- * @property {number} fee       - 小計（price × qty）
+ * @property {string} productId - Item ID
+ * @property {number} qty       - Quantity
+ * @property {number} price     - Unit price
+ * @property {number} fee       - Subtotal (price x qty)
  */
 
 /**
- * 通用 API 回應包裝
- * 對應後端：CommonResponse
+ * Generic API response wrapper
+ * Maps to backend: CommonResponse
  * @typedef {Object} ApiResponse
- * @property {*} data - 回應資料（成功時為 OrderRst，失敗時為錯誤訊息字串）
+ * @property {*} data - Response data (OrderRst on success, error message string on failure)
  */
 ```
 
-### 訂單狀態列舉（對應後端 `OrderStatus`）
+### Order Status Enum (maps to backend `OrderStatus`)
 
 ```javascript
-/** 對應後端：solid.humank.coffeeshop.order.models.OrderStatus */
+/** Maps to backend: solid.humank.coffeeshop.order.models.OrderStatus */
 const ORDER_STATUS = {
   INITIAL: 0,
   PROCESSING: 1,
@@ -282,86 +282,86 @@ const ORDER_STATUS = {
 };
 ```
 
-### 咖啡品項（前端定義，搭配 fallback data）
+### Coffee Items (frontend defined, with fallback data)
 
 ```javascript
 /**
- * 咖啡品項
- * 前端擴展模型，後端 CoffeeResource 目前回傳簡化資料
+ * Coffee menu item
+ * Frontend extended model; backend CoffeeResource currently returns simplified data
  * @typedef {Object} CoffeeMenuItem
- * @property {string} id          - 品項 ID
- * @property {string} name        - 品項名稱
- * @property {string} image       - 圖片路徑
- * @property {SizeOption[]} sizes - 杯型選項
- * @property {Recipe} recipe      - 製作食譜
- * @property {Customization[]} customizations - 客製化選項
+ * @property {string} id          - Item ID
+ * @property {string} name        - Item name
+ * @property {string} image       - Image path
+ * @property {SizeOption[]} sizes - Size options
+ * @property {Recipe} recipe      - Preparation recipe
+ * @property {Customization[]} customizations - Customization options
  */
 
 /**
- * 杯型選項
+ * Size option
  * @typedef {Object} SizeOption
- * @property {string} size   - 杯型名稱（Single/Double/Short/Tall/Grande/Venti）
- * @property {number} ml     - 容量（毫升）
- * @property {number} price  - 價格（新台幣）
+ * @property {string} size   - Size name (Single/Double/Short/Tall/Grande/Venti)
+ * @property {number} ml     - Volume (milliliters)
+ * @property {number} price  - Price (TWD)
  */
 
 /**
- * 製作食譜
+ * Preparation recipe
  * @typedef {Object} Recipe
- * @property {number} espressoShots - espresso shot 數量
- * @property {number} milkMl        - 牛奶用量（ml）
- * @property {number} waterMl       - 水量（ml）
- * @property {string} [foam]        - 奶泡類型
+ * @property {number} espressoShots - Espresso shot count
+ * @property {number} milkMl        - Milk volume (ml)
+ * @property {number} waterMl       - Water volume (ml)
+ * @property {string} [foam]        - Foam type
  */
 
 /**
- * 客製化選項
+ * Customization option
  * @typedef {Object} Customization
- * @property {string} id      - 選項 ID
- * @property {string} label   - 顯示名稱
- * @property {string} type    - 類型（"select" | "toggle"）
- * @property {CustomizationChoice[]} choices - 可選值
+ * @property {string} id      - Option ID
+ * @property {string} label   - Display name
+ * @property {string} type    - Type ("select" | "toggle")
+ * @property {CustomizationChoice[]} choices - Available choices
  */
 ```
 
-### 庫存（前端定義，搭配 fallback data）
+### Inventory (frontend defined, with fallback data)
 
 ```javascript
 /**
- * 庫存品項
- * 前端擴展模型，後端 InventoryResource 目前回傳簡化資料
+ * Inventory item
+ * Frontend extended model; backend InventoryResource currently returns simplified data
  * @typedef {Object} InventoryItem
- * @property {string} id          - 原物料 ID
- * @property {string} name        - 原物料名稱
- * @property {string} unit        - 單位（瓶、袋、包）
- * @property {number} current     - 目前數量
- * @property {number} max         - 最大容量
- * @property {string} [image]     - 圖片路徑
+ * @property {string} id          - Raw material ID
+ * @property {string} name        - Raw material name
+ * @property {string} unit        - Unit (bottle, bag, pack)
+ * @property {number} current     - Current quantity
+ * @property {number} max         - Maximum capacity
+ * @property {string} [image]     - Image path
  */
 ```
 
-### 前端狀態模型
+### Frontend State Model
 
 ```javascript
 /**
- * 全域應用程式狀態
+ * Global application state
  * @typedef {Object} AppState
- * @property {Object} order          - 當前點餐狀態
- * @property {string} order.tableNo  - 選擇的桌號
- * @property {string} order.productId - 選擇的咖啡品項
- * @property {string} order.size     - 選擇的杯型
- * @property {Object} order.customizations - 客製化選項
- * @property {number} order.total    - 訂單總金額
- * @property {CoffeeMenuItem[]} menu - 咖啡菜單資料
- * @property {InventoryItem[]} inventory - 庫存資料
- * @property {Object} loading        - 各區塊載入狀態
- * @property {Object} errors         - 各區塊錯誤狀態
+ * @property {Object} order          - Current order state
+ * @property {string} order.tableNo  - Selected table number
+ * @property {string} order.productId - Selected coffee item
+ * @property {string} order.size     - Selected size
+ * @property {Object} order.customizations - Customization options
+ * @property {number} order.total    - Order total
+ * @property {CoffeeMenuItem[]} menu - Coffee menu data
+ * @property {InventoryItem[]} inventory - Inventory data
+ * @property {Object} loading        - Loading state per section
+ * @property {Object} errors         - Error state per section
  */
 ```
 
-### 咖啡品項靜態資料（fallback-data.js）
+### Coffee Item Static Data (fallback-data.js)
 
-以下為降級方案使用的靜態資料，對應需求 4 的品項與價格定義：
+The following static data is used for the fallback mechanism, corresponding to the items and prices defined in Requirement 4:
 
 ```javascript
 const FALLBACK_MENU = [
@@ -399,25 +399,25 @@ const FALLBACK_MENU = [
       { size: 'Grande', ml: 480, price: 140 },
       { size: 'Venti', ml: 600, price: 160 }
     ],
-    recipe: { espressoShots: 2, milkMl: 180, waterMl: 0, foam: '一般奶泡' },
+    recipe: { espressoShots: 2, milkMl: 180, waterMl: 0, foam: 'Regular foam' },
     customizations: [
       {
         id: 'foam',
-        label: '奶泡選項',
+        label: 'Foam Options',
         type: 'select',
         choices: [
-          { value: 'none', label: '無奶泡', priceAdjust: 0 },
-          { value: 'normal', label: '一般奶泡', priceAdjust: 0 },
-          { value: 'extra', label: '多奶泡', priceAdjust: 0 }
+          { value: 'none', label: 'No Foam', priceAdjust: 0 },
+          { value: 'normal', label: 'Regular Foam', priceAdjust: 0 },
+          { value: 'extra', label: 'Extra Foam', priceAdjust: 0 }
         ]
       },
       {
         id: 'soy',
-        label: '豆漿替代',
+        label: 'Soy Milk Substitute',
         type: 'toggle',
         choices: [
-          { value: false, label: '鮮奶', priceAdjust: 0 },
-          { value: true, label: '豆漿替代', priceAdjust: 0 }
+          { value: false, label: 'Regular Milk', priceAdjust: 0 },
+          { value: true, label: 'Soy Milk Substitute', priceAdjust: 0 }
         ]
       }
     ]
@@ -432,33 +432,33 @@ const FALLBACK_MENU = [
       { size: 'Grande', ml: 480, price: 140 },
       { size: 'Venti', ml: 600, price: 160 }
     ],
-    recipe: { espressoShots: 2, milkMl: 120, waterMl: 0, foam: '厚奶泡' },
+    recipe: { espressoShots: 2, milkMl: 120, waterMl: 0, foam: 'Thick foam' },
     customizations: [
       {
         id: 'foamType',
-        label: '奶泡類型',
+        label: 'Foam Type',
         type: 'select',
         choices: [
-          { value: 'dry', label: '乾式奶泡（Dry）', priceAdjust: 0 },
-          { value: 'wet', label: '濕式奶泡（Wet）', priceAdjust: 0 }
+          { value: 'dry', label: 'Dry Foam', priceAdjust: 0 },
+          { value: 'wet', label: 'Wet Foam', priceAdjust: 0 }
         ]
       },
       {
         id: 'whippedCream',
-        label: '鮮奶油加購',
+        label: 'Whipped Cream Add-on',
         type: 'toggle',
         choices: [
-          { value: false, label: '不加', priceAdjust: 0 },
-          { value: true, label: '加鮮奶油', priceAdjust: 20 }
+          { value: false, label: 'None', priceAdjust: 0 },
+          { value: true, label: 'Add Whipped Cream', priceAdjust: 20 }
         ]
       },
       {
         id: 'soy',
-        label: '豆漿替代',
+        label: 'Soy Milk Substitute',
         type: 'toggle',
         choices: [
-          { value: false, label: '鮮奶', priceAdjust: 0 },
-          { value: true, label: '豆漿替代', priceAdjust: 0 }
+          { value: false, label: 'Regular Milk', priceAdjust: 0 },
+          { value: true, label: 'Soy Milk Substitute', priceAdjust: 0 }
         ]
       }
     ]
@@ -466,30 +466,30 @@ const FALLBACK_MENU = [
 ];
 
 const FALLBACK_INVENTORY = [
-  { id: 'soymilk', name: '豆漿', unit: '瓶', current: 20, max: 50, image: 'assets/images/milk.jpg' },
-  { id: 'milk', name: '鮮奶', unit: '瓶', current: 50, max: 100, image: 'assets/images/milk.jpg' },
-  { id: 'beans', name: '咖啡豆', unit: '袋', current: 100, max: 200, image: 'assets/images/coffee-beans.jpg' },
-  { id: 'filter', name: '濾紙', unit: '包', current: 200, max: 500 }
+  { id: 'soymilk', name: 'Soy Milk', unit: 'bottles', current: 20, max: 50, image: 'assets/images/milk.jpg' },
+  { id: 'milk', name: 'Milk', unit: 'bottles', current: 50, max: 100, image: 'assets/images/milk.jpg' },
+  { id: 'beans', name: 'Coffee Beans', unit: 'bags', current: 100, max: 200, image: 'assets/images/coffee-beans.jpg' },
+  { id: 'filter', name: 'Filter Paper', unit: 'packs', current: 200, max: 500 }
 ];
 ```
 
-### 響應式佈局策略
+### Responsive Layout Strategy
 
-| 斷點 | 寬度 | 佈局調整 |
-|------|------|----------|
-| Mobile | < 768px | 單欄、漢堡選單、卡片堆疊、表單全寬 |
-| Tablet | 768px - 1023px | 雙欄卡片、側邊導覽收合 |
-| Desktop | 1024px - 1439px | 三欄卡片、完整導覽列 |
-| Wide | ≥ 1440px | max-w-7xl 置中、四欄庫存卡片 |
+| Breakpoint | Width | Layout Adjustment |
+|-----------|-------|-------------------|
+| Mobile | < 768px | Single column, hamburger menu, stacked cards, full-width form |
+| Tablet | 768px - 1023px | Two-column cards, collapsed side navigation |
+| Desktop | 1024px - 1439px | Three-column cards, full navigation bar |
+| Wide | >= 1440px | max-w-7xl centered, four-column inventory cards |
 
-Tailwind 斷點對應：`sm:640px`、`md:768px`、`lg:1024px`、`xl:1280px`、`2xl:1536px`
+Tailwind breakpoint mapping: `sm:640px`, `md:768px`, `lg:1024px`, `xl:1280px`, `2xl:1536px`
 
-### 狀態管理方式
+### State Management Approach
 
-使用模組化全域物件管理狀態，各元件透過事件驅動更新 UI：
+Uses a modular global object for state management; components update UI via event-driven patterns:
 
 ```javascript
-// app.js 中的全域狀態
+// Global state in app.js
 const state = {
   order: { tableNo: '', productId: '', size: '', customizations: {}, total: 0 },
   menu: [],
@@ -498,7 +498,7 @@ const state = {
   errors: { menu: null, inventory: null, order: null }
 };
 
-// 狀態更新後觸發 UI 重新渲染
+// Trigger UI re-render after state update
 function updateState(section, data) {
   Object.assign(state[section], data);
   renderSection(section);
@@ -508,172 +508,172 @@ function updateState(section, data) {
 
 ---
 
-## 正確性屬性（Correctness Properties）
+## Correctness Properties
 
-*屬性（Property）是一種在系統所有有效執行中都應成立的特徵或行為——本質上是對系統應做之事的形式化陳述。屬性作為人類可讀規格與機器可驗證正確性保證之間的橋樑。*
+*A property is a characteristic or behavior that should hold across all valid executions of a system — essentially a formalized statement of what the system should do. Properties serve as a bridge between human-readable specifications and machine-verifiable correctness guarantees.*
 
-### Property 1：可點擊元素皆具備互動回饋
+### Property 1: Clickable elements have interactive feedback
 
-*For any* 頁面中的可點擊元素（按鈕、連結、卡片），該元素應具備 `cursor: pointer` 樣式，且其 `transition-duration` 值應介於 150ms 至 300ms 之間。
+*For any* clickable element on the page (buttons, links, cards), the element should have `cursor: pointer` style, and its `transition-duration` value should be between 150ms and 300ms.
 
 **Validates: Requirements 1.4**
 
-### Property 2：所有區塊使用一致的最大寬度容器
+### Property 2: All sections use consistent max-width container
 
-*For any* 頁面中的內容區塊（section），其直接子容器應包含 `max-w-7xl` class。
+*For any* content section on the page, its direct child container should include the `max-w-7xl` class.
 
 **Validates: Requirements 1.7**
 
-### Property 3：非 Espresso 品項顯示四種標準杯型
+### Property 3: Non-Espresso items display four standard sizes
 
-*For any* 非 Espresso 的咖啡品項（Americano、Latte、Cappuccino），呼叫 `updateSizeOptions(productId)` 後，應回傳恰好 Short、Tall、Grande、Venti 四種杯型選項。
+*For any* non-Espresso coffee item (Americano, Latte, Cappuccino), calling `updateSizeOptions(productId)` should return exactly Short, Tall, Grande, and Venti size options.
 
 **Validates: Requirements 4.4**
 
-### Property 4：訂單總金額計算正確
+### Property 4: Order total calculation is correct
 
-*For any* 有效的訂單組合（品項、杯型、客製化選項），`calculateTotal()` 的結果應等於所選杯型的基礎價格加上所有客製化選項的價格調整總和。
+*For any* valid order combination (item, size, customization options), the result of `calculateTotal()` should equal the selected size's base price plus the sum of all customization option price adjustments.
 
 **Validates: Requirements 4.7**
 
-### Property 5：訂單提交請求格式正確
+### Property 5: Order submission request format is correct
 
-*For any* 有效的訂單狀態（含 productId、qty、price），`submitOrder()` 建構的請求 body 應符合後端 `AddOrderReq` 格式：包含 `items` 陣列，每個元素具備 `productId`（string）、`qty`（number）、`price`（number）三個欄位。
+*For any* valid order state (containing productId, qty, price), the request body constructed by `submitOrder()` should conform to the backend `AddOrderReq` format: containing an `items` array where each element has `productId` (string), `qty` (number), and `price` (number) fields.
 
 **Validates: Requirements 4.8**
 
-### Property 6：API 錯誤顯示錯誤訊息與重試按鈕
+### Property 6: API errors display error message and retry button
 
-*For any* API 請求失敗（含 HTTP 4xx/5xx 錯誤與網路錯誤），對應的 UI 區塊應顯示使用者友善的錯誤訊息，且包含一個可點擊的重試按鈕。
+*For any* failed API request (including HTTP 4xx/5xx errors and network errors), the corresponding UI section should display a user-friendly error message and include a clickable retry button.
 
 **Validates: Requirements 4.10, 7.4**
 
-### Property 7：菜單卡片顯示完整資訊
+### Property 7: Menu cards display complete information
 
-*For any* 咖啡品項資料（CoffeeMenuItem），渲染後的 Menu_Card 應包含品項名稱、所有杯型的容量（ml）與價格、以及製作食譜資訊（espresso shots、牛奶用量、水量）。
+*For any* coffee item data (CoffeeMenuItem), the rendered Menu_Card should contain the item name, all size volumes (ml) and prices, and recipe information (espresso shots, milk volume, water volume).
 
 **Validates: Requirements 5.2, 5.3**
 
-### Property 8：菜單卡片展開/收合切換
+### Property 8: Menu card expand/collapse toggle
 
-*For any* Menu_Card 元素，點擊一次應展開顯示完整食譜細節，再點擊一次應收合回原始狀態。
+*For any* Menu_Card element, clicking once should expand to show full recipe details, clicking again should collapse back to the original state.
 
 **Validates: Requirements 5.4**
 
-### Property 9：API 失敗時使用降級資料
+### Property 9: API failure uses fallback data
 
-*For any* API 請求失敗（Coffee Service 或 Inventory Service），對應區塊應使用 fallback 靜態資料渲染，且渲染結果與使用 API 資料時的結構一致。
+*For any* failed API request (Coffee Service or Inventory Service), the corresponding section should render using fallback static data, and the rendered result should have the same structure as when using API data.
 
 **Validates: Requirements 5.7, 6.6**
 
-### Property 10：庫存儀表板顯示完整資訊與正確百分比
+### Property 10: Inventory dashboard displays complete info with correct percentages
 
-*For any* 庫存品項（InventoryItem），儀表板應顯示原物料名稱、目前數量、最大容量，且進度條寬度百分比應等於 `(current / max) * 100`。
+*For any* inventory item (InventoryItem), the dashboard should display the raw material name, current quantity, and maximum capacity, and the progress bar width percentage should equal `(current / max) * 100`.
 
 **Validates: Requirements 6.2, 6.7**
 
-### Property 11：低庫存警告色
+### Property 11: Low stock warning color
 
-*For any* 庫存品項，當 `current / max < 0.3` 時，Stock_Indicator 的進度條應使用警告色（紅色或橘色）；當 `current / max >= 0.3` 時，應使用正常色。
+*For any* inventory item, when `current / max < 0.3`, the Stock_Indicator progress bar should use a warning color (red or orange); when `current / max >= 0.3`, it should use the normal color.
 
 **Validates: Requirements 6.3**
 
-### Property 12：API 請求逾時處理
+### Property 12: API request timeout handling
 
-*For any* API 請求，若回應時間超過 10 秒，`apiFetch()` 應中止該請求（AbortController）並拋出逾時錯誤。
+*For any* API request, if the response time exceeds 10 seconds, `apiFetch()` should abort the request (AbortController) and throw a timeout error.
 
 **Validates: Requirements 7.3**
 
-### Property 13：API 載入狀態指示
+### Property 13: API loading state indicator
 
-*For any* 進行中的 API 請求，對應的 UI 區塊應顯示 Loading_Skeleton 佔位元件；請求完成後，骨架應被移除。
+*For any* in-progress API request, the corresponding UI section should display a Loading_Skeleton placeholder; after the request completes, the skeleton should be removed.
 
 **Validates: Requirements 7.2**
 
-### Property 14：API 請求日誌記錄
+### Property 14: API request logging
 
-*For any* API 請求（無論成功或失敗），`apiFetch()` 應在瀏覽器 console 記錄請求 URL、方法、回應狀態碼的摘要資訊。
+*For any* API request (whether successful or failed), `apiFetch()` should log summary information including request URL, method, and response status code in the browser console.
 
 **Validates: Requirements 7.5**
 
-### Property 15：所有圖片具備替代文字
+### Property 15: All images have alt text
 
-*For any* 頁面中的 `<img>` 元素，應具備非空的 `alt` 屬性。
+*For any* `<img>` element on the page, it should have a non-empty `alt` attribute.
 
 **Validates: Requirements 8.2**
 
-### Property 16：所有表單輸入具備關聯 label
+### Property 16: All form inputs have associated labels
 
-*For any* 頁面中的表單輸入元素（`<input>`、`<select>`），應具備透過 `for`/`id` 關聯的 `<label>` 元素。
+*For any* form input element (`<input>`, `<select>`) on the page, it should have an associated `<label>` element linked via `for`/`id`.
 
 **Validates: Requirements 8.3**
 
-### Property 17：禁止使用 emoji 作為圖示
+### Property 17: No emoji used as icons
 
-*For any* 頁面中作為圖示用途的元素，應為 SVG 元素，不應包含 emoji 字元（Unicode Emoji 範圍）。
+*For any* element used as an icon on the page, it should be an SVG element and should not contain emoji characters (Unicode Emoji range).
 
 **Validates: Requirements 8.7**
 
 ---
 
-## 錯誤處理
+## Error Handling
 
-### API 錯誤處理策略
+### API Error Handling Strategy
 
-| 錯誤類型 | 處理方式 | 使用者體驗 |
-|----------|----------|------------|
-| 網路錯誤（無法連線） | 使用 fallback 靜態資料 + 顯示重試按鈕 | 仍可瀏覽靜態內容 |
-| HTTP 4xx（客戶端錯誤） | 顯示具體錯誤訊息 + 重試按鈕 | 提示使用者修正輸入 |
-| HTTP 5xx（伺服器錯誤） | 顯示通用錯誤訊息 + 重試按鈕 | 提示稍後再試 |
-| 逾時（> 10 秒） | AbortController 中止 + 顯示逾時訊息 + 重試按鈕 | 提示網路可能不穩定 |
-| JSON 解析錯誤 | 使用 fallback 靜態資料 + console 記錄 | 無感降級 |
+| Error Type | Handling | User Experience |
+|-----------|---------|-----------------|
+| Network error (unreachable) | Use fallback static data + show retry button | Can still browse static content |
+| HTTP 4xx (client error) | Show specific error message + retry button | Prompt user to correct input |
+| HTTP 5xx (server error) | Show generic error message + retry button | Prompt to try again later |
+| Timeout (> 10 seconds) | AbortController abort + show timeout message + retry button | Prompt about possible network instability |
+| JSON parse error | Use fallback static data + console log | Seamless degradation |
 
-### 錯誤訊息範本
+### Error Message Templates
 
 ```javascript
 const ERROR_MESSAGES = {
-  network: '無法連線至伺服器，目前顯示的是預設資料。',
-  timeout: '請求逾時，請檢查網路連線後重試。',
-  orderFailed: '訂單建立失敗，請稍後再試。',
-  serverError: '伺服器發生錯誤，請稍後再試。',
-  unknown: '發生未預期的錯誤，請重新整理頁面。'
+  network: 'Unable to connect to server. Currently showing default data.',
+  timeout: 'Request timed out. Please check your network connection and retry.',
+  orderFailed: 'Order creation failed. Please try again later.',
+  serverError: 'Server error occurred. Please try again later.',
+  unknown: 'An unexpected error occurred. Please refresh the page.'
 };
 ```
 
-### 降級方案流程
+### Fallback Flow
 
 ```mermaid
 flowchart TD
-    A[發起 API 請求] --> B{請求成功？}
-    B -->|是| C[使用 API 回傳資料渲染]
-    B -->|否| D{是否為 GET 請求？}
-    D -->|是| E[使用 fallback 靜態資料渲染]
-    D -->|否| F[顯示錯誤訊息 + 重試按鈕]
-    E --> G[顯示「目前為離線模式」提示]
+    A[Initiate API Request] --> B{Request Successful?}
+    B -->|Yes| C[Render with API response data]
+    B -->|No| D{Is it a GET request?}
+    D -->|Yes| E[Render with fallback static data]
+    D -->|No| F[Show error message + retry button]
+    E --> G[Show "Currently in offline mode" notice]
 ```
 
 ---
 
-## 測試策略
+## Testing Strategy
 
-### 雙軌測試方法
+### Dual-Track Testing Approach
 
-本專案採用單元測試（Unit Tests）與屬性測試（Property-Based Tests）並行的策略，確保全面覆蓋。
+This project uses unit tests and property-based tests in parallel to ensure comprehensive coverage.
 
-### 屬性測試（Property-Based Testing）
+### Property-Based Testing
 
-- **測試庫：** [fast-check](https://github.com/dubzzz/fast-check)（JavaScript PBT 庫）
-- **最低迭代次數：** 每個屬性測試至少執行 100 次
-- **標記格式：** `Feature: coffeeshop-showcase-website, Property {number}: {property_text}`
+- **Testing library:** [fast-check](https://github.com/dubzzz/fast-check) (JavaScript PBT library)
+- **Minimum iterations:** Each property test runs at least 100 times
+- **Tag format:** `Feature: coffeeshop-showcase-website, Property {number}: {property_text}`
 
-每個正確性屬性（Property 1-17）對應一個 property-based test，使用 fast-check 產生隨機輸入驗證屬性成立。
+Each correctness property (Property 1-17) maps to a property-based test using fast-check to generate random inputs and verify the property holds.
 
-#### 屬性測試範例
+#### Property Test Example
 
 ```javascript
 import fc from 'fast-check';
 
-// Feature: coffeeshop-showcase-website, Property 4: 訂單總金額計算正確
+// Feature: coffeeshop-showcase-website, Property 4: Order total calculation is correct
 test('calculateTotal returns base price + customization adjustments', () => {
   fc.assert(
     fc.property(
@@ -683,7 +683,7 @@ test('calculateTotal returns base price + customization adjustments', () => {
       }),
       ({ basePrice, adjustments }) => {
         const expected = basePrice + adjustments.reduce((sum, a) => sum + a, 0);
-        // ... 呼叫 calculateTotal 並驗證
+        // ... call calculateTotal and verify
         return true;
       }
     ),
@@ -692,26 +692,26 @@ test('calculateTotal returns base price + customization adjustments', () => {
 });
 ```
 
-### 單元測試（Unit Tests）
+### Unit Tests
 
-- **測試框架：** Vitest
-- **重點覆蓋：**
-  - 具體範例：Espresso 僅顯示 Single/Double（需求 4.3）、Latte 客製化選項（需求 4.5）、Cappuccino 客製化選項（需求 4.6）
-  - 邊界案例：空訂單提交、庫存恰好 30% 的邊界值
-  - 整合點：API 設定檔切換（需求 7.1）、語意化 HTML 結構（需求 8.6）
-  - 特定 UI 狀態：訂單成功回應顯示訂單編號（需求 4.9）、Hero 區塊標題文字（需求 2.1）
+- **Testing framework:** Vitest
+- **Key coverage:**
+  - Specific examples: Espresso only shows Single/Double (Req 4.3), Latte customization options (Req 4.5), Cappuccino customization options (Req 4.6)
+  - Edge cases: Empty order submission, inventory exactly at 30% boundary
+  - Integration points: API config switching (Req 7.1), semantic HTML structure (Req 8.6)
+  - Specific UI states: Order success response showing order number (Req 4.9), Hero section title text (Req 2.1)
 
-### 測試檔案結構
+### Test File Structure
 
 ```
 website/
 └── tests/
     ├── unit/
-    │   ├── order-form.test.js    # 點餐表單單元測試
-    │   ├── menu.test.js          # 菜單元件單元測試
-    │   ├── inventory.test.js     # 庫存元件單元測試
-    │   ├── api.test.js           # API 層單元測試
-    │   └── dom.test.js           # DOM 工具單元測試
+    │   ├── order-form.test.js    # Order form unit tests
+    │   ├── menu.test.js          # Menu component unit tests
+    │   ├── inventory.test.js     # Inventory component unit tests
+    │   ├── api.test.js           # API layer unit tests
+    │   └── dom.test.js           # DOM utility unit tests
     └── property/
         ├── order-calc.property.js    # Property 4, 5
         ├── menu-render.property.js   # Property 7, 8

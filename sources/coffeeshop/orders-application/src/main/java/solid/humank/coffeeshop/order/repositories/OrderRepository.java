@@ -6,11 +6,11 @@ import solid.humank.coffeeshop.order.models.Order;
 import solid.humank.coffeeshop.order.models.OrderId;
 import solid.humank.ddd.commons.baseclasses.Specification;
 
-import javax.enterprise.context.Dependent;
+import org.springframework.stereotype.Repository;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Dependent
+@Repository
 public class OrderRepository implements IOrderRepository {
 
     DDBRepositoryBase<Order, OrderId> repository = new DDBRepositoryBase<>();

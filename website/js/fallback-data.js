@@ -47,25 +47,25 @@ const FALLBACK_MENU = Object.freeze([
       Object.freeze({ size: 'Grande', ml: 480, price: 140 }),
       Object.freeze({ size: 'Venti', ml: 600, price: 160 }),
     ]),
-    recipe: Object.freeze({ espressoShots: 2, milkMl: 180, waterMl: 0, foam: '一般奶泡' }),
+    recipe: Object.freeze({ espressoShots: 2, milkMl: 180, waterMl: 0, foam: 'Regular Foam' }),
     customizations: Object.freeze([
       Object.freeze({
         id: 'foam',
-        label: '奶泡選項',
+        label: 'Foam Options',
         type: 'select',
         choices: Object.freeze([
-          Object.freeze({ value: 'none', label: '無奶泡', priceAdjust: 0 }),
-          Object.freeze({ value: 'normal', label: '一般奶泡', priceAdjust: 0 }),
-          Object.freeze({ value: 'extra', label: '多奶泡', priceAdjust: 0 }),
+          Object.freeze({ value: 'none', label: 'No Foam', priceAdjust: 0 }),
+          Object.freeze({ value: 'normal', label: 'Regular Foam', priceAdjust: 0 }),
+          Object.freeze({ value: 'extra', label: 'Extra Foam', priceAdjust: 0 }),
         ]),
       }),
       Object.freeze({
         id: 'soy',
-        label: '豆漿替代',
+        label: 'Soy Milk Substitute',
         type: 'toggle',
         choices: Object.freeze([
-          Object.freeze({ value: false, label: '鮮奶', priceAdjust: 0 }),
-          Object.freeze({ value: true, label: '豆漿替代', priceAdjust: 0 }),
+          Object.freeze({ value: false, label: 'Fresh Milk', priceAdjust: 0 }),
+          Object.freeze({ value: true, label: 'Soy Milk Substitute', priceAdjust: 0 }),
         ]),
       }),
     ]),
@@ -80,33 +80,33 @@ const FALLBACK_MENU = Object.freeze([
       Object.freeze({ size: 'Grande', ml: 480, price: 140 }),
       Object.freeze({ size: 'Venti', ml: 600, price: 160 }),
     ]),
-    recipe: Object.freeze({ espressoShots: 2, milkMl: 120, waterMl: 0, foam: '厚奶泡' }),
+    recipe: Object.freeze({ espressoShots: 2, milkMl: 120, waterMl: 0, foam: 'Thick Foam' }),
     customizations: Object.freeze([
       Object.freeze({
         id: 'foamType',
-        label: '奶泡類型',
+        label: 'Foam Type',
         type: 'select',
         choices: Object.freeze([
-          Object.freeze({ value: 'dry', label: '乾式奶泡（Dry）', priceAdjust: 0 }),
-          Object.freeze({ value: 'wet', label: '濕式奶泡（Wet）', priceAdjust: 0 }),
+          Object.freeze({ value: 'dry', label: 'Dry Foam', priceAdjust: 0 }),
+          Object.freeze({ value: 'wet', label: 'Wet Foam', priceAdjust: 0 }),
         ]),
       }),
       Object.freeze({
         id: 'whippedCream',
-        label: '鮮奶油加購',
+        label: 'Add Whipped Cream',
         type: 'toggle',
         choices: Object.freeze([
-          Object.freeze({ value: false, label: '不加', priceAdjust: 0 }),
-          Object.freeze({ value: true, label: '加鮮奶油', priceAdjust: 20 }),
+          Object.freeze({ value: false, label: 'None', priceAdjust: 0 }),
+          Object.freeze({ value: true, label: 'Add Whipped Cream', priceAdjust: 20 }),
         ]),
       }),
       Object.freeze({
         id: 'soy',
-        label: '豆漿替代',
+        label: 'Soy Milk Substitute',
         type: 'toggle',
         choices: Object.freeze([
-          Object.freeze({ value: false, label: '鮮奶', priceAdjust: 0 }),
-          Object.freeze({ value: true, label: '豆漿替代', priceAdjust: 0 }),
+          Object.freeze({ value: false, label: 'Fresh Milk', priceAdjust: 0 }),
+          Object.freeze({ value: true, label: 'Soy Milk Substitute', priceAdjust: 0 }),
         ]),
       }),
     ]),
@@ -117,8 +117,8 @@ const FALLBACK_MENU = Object.freeze([
  * @type {InventoryItem[]}
  */
 const FALLBACK_INVENTORY = Object.freeze([
-  Object.freeze({ id: 'soymilk', name: '豆漿', unit: '瓶', current: 20, max: 50, image: 'assets/images/milk.jpg' }),
-  Object.freeze({ id: 'milk', name: '鮮奶', unit: '瓶', current: 50, max: 100, image: 'assets/images/milk.jpg' }),
-  Object.freeze({ id: 'beans', name: '咖啡豆', unit: '袋', current: 100, max: 200, image: 'assets/images/coffee-beans.jpg' }),
-  Object.freeze({ id: 'filter', name: '濾紙', unit: '包', current: 200, max: 500 }),
+  Object.freeze({ id: 'soymilk', name: 'Soy Milk', unit: 'bottles', current: 20, max: 50, image: 'assets/images/milk.jpg' }),
+  Object.freeze({ id: 'milk', name: 'Fresh Milk', unit: 'bottles', current: 50, max: 100, image: 'assets/images/milk.jpg' }),
+  Object.freeze({ id: 'beans', name: 'Coffee Beans', unit: 'bags', current: 100, max: 200, image: 'assets/images/coffee-beans.jpg' }),
+  Object.freeze({ id: 'filter', name: 'Filter Paper', unit: 'packs', current: 200, max: 500 }),
 ]);

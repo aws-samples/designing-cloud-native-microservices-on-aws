@@ -1,19 +1,18 @@
 package solid.humank.coffee.inventory.controllers;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
+import org.springframework.web.bind.annotation.*;
 
-@Path("/inventory")
+@RestController
+@RequestMapping("/inventory")
 public class InventoryResource {
 
-    @GET
+    @GetMapping
     public String sayHello() {
         return "hello";
     }
 
-    @PUT
-    public String takeOut(CoffeeBean coffeeBean) {
+    @PutMapping
+    public String takeOut(@RequestBody CoffeeBean coffeeBean) {
 
         return "success-200";
     }
